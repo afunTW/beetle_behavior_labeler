@@ -32,7 +32,10 @@ class Interface(object):
             self.init_video()
             with open(self.trajectory_path, 'r') as f:
                 self.__trajectory__ = json.load(f)
-            print(self.__trajectory__.keys())
+            self.scale_n_frame.state(['!disabled'])
+            self.scale_n_frame['to_'] = self.total_frame
+            self.label_n_frame_right['text'] = self.total_frame
+            # print(self.__trajectory__.keys())
 
     def get_path(self):
         path = askopenfilename(title='請選擇影像路徑', filetypes=[('video file (*.avi;)', '*.avi;')])

@@ -14,3 +14,8 @@ class KeyHandler(object):
                 print(popup.value)
             except:
                 pass
+
+    def set_n_frame(self, s):
+        v = int(float(s))
+        self.var_n_frame.set(v)
+        self.stop_ind = v

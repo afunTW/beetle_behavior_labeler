@@ -16,7 +16,6 @@ class Utils(object):
                     p = tuple(traj[ind])
                     cv2.circle(self.__frame__, p, 10, (255, 255, 0), 1)
                 except Exception as e:
-                    print(e)
                     pass
 
         if self.parent.state() == 'zoomed':
@@ -26,7 +25,10 @@ class Utils(object):
             shrink_r = max(r1, r2)
             self._c_width = self._r_width / shrink_r
             self._c_height = self._r_height / shrink_r
-            newsize = (int(shape[1] * self._c_width * 0.95), int(shape[0] * self._c_height * 0.95))
+            nw = int(shape[1] * self._c_width)
+            nh = int(shape[0] * nw / shape[1])
+            newsize = (nw, nh)
+            # newsize = (int(shape[1] * self._c_width * 0.96), int(shape[0] * self._c_height * 0.9))
             self.__frame__ = cv2.resize(self.__frame__, newsize)
 
         self.__frame__ = cv2.cvtColor(self.__frame__, cv2.COLOR_BGR2RGB)

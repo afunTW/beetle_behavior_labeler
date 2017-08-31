@@ -28,6 +28,10 @@ class Labeler(KeyHandler, Interface, Utils):
         self.__frame__ = None
         self.__orig_frame__ = None
         self.__image__ = None
+        self.var_n_frame = None
+        self.scale_n_frame = None
+        self.label_n_frame_left = None
+        self.label_n_frame_right = None
 
         # UI
         self.parent = tk.Tk()
@@ -95,10 +99,31 @@ class Labeler(KeyHandler, Interface, Utils):
         menu.add_cascade(label='Help', menu=help)
 
     def create_button(self):
+        # button to click
         b1 = ttk.Button(self.button_frame, text='next (will change to icon)', command=lambda: print('button 1 was pressed'), style='TButton')
         b1.grid(row=0, column=0, sticky='news', padx=5, pady=5)
         b2 = ttk.Button(self.button_frame, text='next (will change to icon)', command=lambda: print('button 2 was pressed'), style='TButton')
         b2.grid(row=0, column=1, sticky='news', padx=5, pady=5)
+
+        # scale bar for n frame
+        self.var_n_frame = tk.IntVar()
+        self.var_n_frame.set(self.stop_ind)
+
+        scale_frame = tk.Frame(self.button_frame)
+        scale_frame.grid(row=1, column=0, sticky='news', columnspan=4)
+        scale_frame.grid_columnconfigure(0, weight=1)
+
+        for i in range(3):
+            scale_frame.grid_columnconfigure(i, weight=1)
+
+        self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
+        self.label_n_frame_left.grid(row=1, column=0)
+        self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1200, command=self.set_n_frame)
+        self.scale_n_frame.set(self.stop_ind)
+        self.scale_n_frame.state(['disabled'])
+        self.scale_n_frame.grid(row=1, column=1)
+        self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
+        self.label_n_frame_right.grid(row=1, column=2)
 
     def create_treeview(self):
         self.tv = ttk.Treeview(self.parent, height=20)
@@ -136,14 +161,17 @@ class Labeler(KeyHandler, Interface, Utils):
         self.display_frame.grid(row=0, column=0, padx=10, pady=10)
         self.display_frame.grid_rowconfigure(0, weight=1)
         self.display_frame.grid_columnconfigure(0, weight=1)
+        self.display_frame.grid_rowconfigure(1, weight=1)
         self.disply_l = ttk.Label(self.display_frame, image=self.__image__)
         self.disply_l.grid(row=0, column=0, sticky='news', padx=10, pady=10)
 
         # frame operation frame
         self.button_frame = ttk.LabelFrame(self.display_frame)
         self.button_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(1, weight=1)
+        for i in range(2):
+            self.button_frame.grid_rowconfigure(i, weight=1)
+            self.button_frame.grid_columnconfigure(i, weight=1)
+
         self.create_button()
 
         # record operation frame
