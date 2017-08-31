@@ -18,8 +18,8 @@ class Labeler(tk.Frame, KeyHandler, Interface, Utils):
         self.trajectory_path = None
         self.__video__ = None
         self.__trajectory__ = None
-        self.width = None
-        self.height = None
+        self.width = 1280
+        self.height = 720
         self.fps = None
         self.resolution = None
         self.total_frame = None
@@ -37,27 +37,38 @@ class Labeler(tk.Frame, KeyHandler, Interface, Utils):
         self.parent.option_add('*tearOff', False)
         tk.Grid.rowconfigure(self, 0 , weight=1)
         tk.Grid.columnconfigure(self, 0 , weight=1)
-        # tk.Grid.rowconfigure(self, 1 , weight=1)
+        tk.Grid.rowconfigure(self, 1 , weight=1)
         # tk.Grid.columnconfigure(self, 1 , weight=1)
+
         style = ttk.Style()
         style.configure("Treeview.Heading", font=('Georgia', 14))
         style.configure("Treeview", font=('Georgia', 12))
-        style.configure("TButton.text.", font=('Georgia', 12))
+        # style.configure("TButton.text.", font=('Georgia', 12))
         # style.configure(".", font=('Helvetica', 15))
 
         self.create_ui()
-        self.update_display()        
+        self.update_display()
+
+        # display label ratio relative to whole window
+        self.update_idletasks()
+        print(self.winfo_reqheight(), self.winfo_reqwidth())
+        print(self.winfo_height(), self.winfo_width())
+        print(self.parent.winfo_reqheight(), self.parent.winfo_reqwidth())
+        self._r_height = self.__frame__.shape[0] / self.winfo_reqheight()
+        self._r_width = self.__frame__.shape[1] / self.winfo_reqwidth()
+        print(self._r_height, self._r_width)
+        
         # maximize the window
         self.parent.state('zoomed')
 
     def update_display(self):
         if self.video_path is not None:
             self.update_frame()
-            self.draw()
-            self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
-            self.disply_l.configure(image=self.__image__)
+        self.draw()
+        self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
+        self.disply_l.configure(image=self.__image__)
 
-        self.disply_l.after(30, self.update_display)
+        self.disply_l.after(20, self.update_display)
 
     def update_frame(self):
         self.__video__.set(cv2.CAP_PROP_POS_FRAMES, self.stop_ind - 1)
@@ -103,7 +114,7 @@ class Labeler(tk.Frame, KeyHandler, Interface, Utils):
         self.tv.column('n', anchor='center', width=90)
         self.tv.heading('b', text='行為')
         self.tv.column('b', anchor='center', width=120)
-        self.tv.grid(row=0, column=1, rowspan=2, sticky='news', padx=10, pady=10)
+        self.tv.grid(row=0, column=1, rowspan=2, sticky='wsne', padx=10, pady=10)
         
         for i, v in enumerate([('1', 'A', 'chase'), ('2', 'B', 'escape'), ('100', 'C', 'attack')]):
             self.tv.insert('', 'end', i, values=v)
@@ -117,13 +128,20 @@ class Labeler(tk.Frame, KeyHandler, Interface, Utils):
         # display label
         self.__frame__ = np.zeros((720, 1280, 3), dtype='uint8')
         cv2.putText(self.__frame__, 'Load Video', (300, 360), 7, 5, (255, 255, 255), 2)
+        self.__orig_frame__ = self.__frame__.copy()
         self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
-        self.disply_l = ttk.Label(self, image=self.__image__)
+        self.display_frame = tk.Frame(self)
+        self.display_frame.grid(sticky='news', padx=10, pady=10)
+        self.display_frame.grid_rowconfigure(0, weight=1)
+        self.display_frame.grid_columnconfigure(0, weight=1)
+        self.disply_l = ttk.Label(self.display_frame, image=self.__image__)
         self.disply_l.grid(row=0, column=0, sticky='news', padx=10, pady=10)
 
         # frame operation frame
         self.button_frame = ttk.LabelFrame(self)
-        self.button_frame.grid(row=1, column=0, sticky='news')
+        self.button_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
+        self.button_frame.grid_rowconfigure(0, weight=1)
+        self.button_frame.grid_rowconfigure(1, weight=1)
         self.create_button()
 
         # record operation frame

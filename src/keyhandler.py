@@ -8,7 +8,7 @@ class KeyHandler(object):
         sel_items = self.tv.selection() if item is None else item
         if sel_items:
             popup = Interface.popupEntry(self.parent, title="更改 object 名稱", string="請輸入新的名稱。")
-            self.root.wait_window(popup.top)
+            self.parent.wait_window(popup.top)
             sel_item = sel_items[0]
 
             print(popup.value)
