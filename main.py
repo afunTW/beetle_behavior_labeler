@@ -11,10 +11,11 @@ from src.app import Labeler
 # args = vars(parser.parse_args())
 
 if __name__ == '__main__':
-    root = tk.Tk()
-    tk.Grid.rowconfigure(root, 0 , weight=1)
-    tk.Grid.columnconfigure(root, 0 , weight=1)
+	Labeler()
+    # root = tk.Tk()
+    # tk.Grid.rowconfigure(root, 0 , weight=1)
+    # tk.Grid.columnconfigure(root, 0 , weight=1)
 
-    Labeler(root, bg='red').grid(sticky='news', padx=0, pady=0)
-    root.focus_force()
-    root.mainloop()
+    # Labeler(root, bg='red').grid(sticky='news', padx=0, pady=0)
+    # root.focus_force()
+    # root.mainloop()
