@@ -33,6 +33,7 @@ class Interface(object):
             with open(self.trajectory_path, 'r') as f:
                 self.__trajectory__ = json.load(f)
             self.scale_n_frame.state(['!disabled'])
+            self.tv.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
             self.label_n_frame_right['text'] = self.total_frame
             # print(self.__trajectory__.keys())
@@ -54,9 +55,67 @@ class Interface(object):
 
         return False
 
+    class popupEdit(object):
+
+        def __init__(self, master, title, name):
+            top=self.top= tk.Toplevel(master)
+            top.title(title)
+            tk.Grid.rowconfigure(top, 0, weight=1)
+            tk.Grid.columnconfigure(top, 0, weight=1)
+            top.transient(master)
+            top.grab_set()
+
+            tk.Label(top, text='幀數', font=("Georgia", 12)).grid(row=0, column=0)
+            tk.Label(top, text='名稱', font=("Georgia", 12)).grid(row=1, column=0)
+            tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0)
+            
+            
+            vcmd = (master.register(self.validate), 
+                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+            self.f = ttk.Entry(top, validate='key', validatecommand=vcmd, width=9)
+            self.f.focus_force()
+            self.f.grid(row=0, column=1)
+            self.n = ttk.Combobox(top, values = name)
+            self.n.current(0)
+            self.n.grid(row=1, column=1)
+            self.b = ttk.Combobox(top, values = ['Attack', 'Wrestle', 'Chase', 'Escape'])
+            self.b.current(0)
+            self.b.grid(row=2, column=1)
+
+            
+            bt = ttk.Button(top,text='Ok',command=self.cleanup, width=5)
+            bt.grid(row=4, column=0, columnspan=2, sticky='w')
+
+            # top.update_idletasks()
+            # width = top.winfo_reqwidth() + 10
+            # height = top.winfo_reqheight() + 10
+            # x = (top.winfo_screenwidth() // 2.25) - (width // 2)
+            # y = (top.winfo_screenheight() // 2) - (height // 2)
+            # top.geometry('+%d+%d' % (x, y))
+            # top.geometry('260x120')
+
+            top.bind('<Escape>', lambda event: top.destroy())
+
+            # pending; bind return, a decent name judge
+        def cleanup(self):
+            self.value = [self.f.get(), self.n.get(), self.b.get()]
+            print(self.value)
+            self.top.destroy()
+
+        def validate(self, action, index, value_if_allowed,
+                           prior_value, text, validation_type, trigger_type, widget_name):
+            if text in '0123456789':
+                try:
+                    float(value_if_allowed)
+                    return True
+                except ValueError:
+                    return False
+            else:
+                return False
+        
     class popupEntry(object):
 
-        def __init__(self,master, title, string, validnum=False):
+        def __init__(self, master, title, string, validnum=False):
             top=self.top= tk.Toplevel(master)
             top.title(title)
             tk.Grid.rowconfigure(top, 0, weight=1)

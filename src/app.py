@@ -100,7 +100,7 @@ class Labeler(KeyHandler, Interface, Utils):
 
     def create_button(self):
         # button to click
-        b1 = ttk.Button(self.button_frame, text='next (will change to icon)', command=lambda: print('button 1 was pressed'), style='TButton')
+        b1 = ttk.Button(self.button_frame, text='previous (will change to icon)', command=lambda: print('button 1 was pressed'), style='TButton')
         b1.grid(row=0, column=0, sticky='news', padx=5, pady=5)
         b2 = ttk.Button(self.button_frame, text='next (will change to icon)', command=lambda: print('button 2 was pressed'), style='TButton')
         b2.grid(row=0, column=1, sticky='news', padx=5, pady=5)
@@ -111,14 +111,13 @@ class Labeler(KeyHandler, Interface, Utils):
 
         scale_frame = tk.Frame(self.button_frame)
         scale_frame.grid(row=1, column=0, sticky='news', columnspan=4)
-        scale_frame.grid_columnconfigure(0, weight=1)
 
         for i in range(3):
             scale_frame.grid_columnconfigure(i, weight=1)
 
         self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
         self.label_n_frame_left.grid(row=1, column=0)
-        self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1200, command=self.set_n_frame)
+        self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1250, command=self.set_n_frame)
         self.scale_n_frame.set(self.stop_ind)
         self.scale_n_frame.state(['disabled'])
         self.scale_n_frame.grid(row=1, column=1)
@@ -143,10 +142,11 @@ class Labeler(KeyHandler, Interface, Utils):
         
         self.tv.configure(yscrollcommand=vsb.set)
         
-        for i, v in enumerate([('1', 'A', 'chase'), ('2', 'B', 'escape'), ('100', 'C', 'attack')] * 20):
+        for i, v in enumerate([('1', 'A', 'chase'), ('2', 'B', 'escape'), ('100', 'C', 'attack')]):
             self.tv.insert('', 'end', i, values=v)
 
         self.tv.bind('<Double-Button-1>', self.tvitem_click)
+        self.tv.state(['disabled'])
 
     def create_ui(self):
         
@@ -178,3 +178,5 @@ class Labeler(KeyHandler, Interface, Utils):
         self.create_treeview()
 
         self.parent.bind('<Escape>', self.on_close)
+        self.parent.bind('<Left>', self.on_left)
+        self.parent.bind('<Right>', self.on_right)
