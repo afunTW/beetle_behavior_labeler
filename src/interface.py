@@ -57,7 +57,7 @@ class Interface(object):
 
     class popupEdit(object):
 
-        def __init__(self, master, title, name):
+        def __init__(self, master, title, name, ind):
             top=self.top= tk.Toplevel(master)
             top.title(title)
             tk.Grid.rowconfigure(top, 0, weight=1)
@@ -65,53 +65,41 @@ class Interface(object):
             top.transient(master)
             top.grab_set()
 
-            tk.Label(top, text='幀數', font=("Georgia", 12)).grid(row=0, column=0)
-            tk.Label(top, text='名稱', font=("Georgia", 12)).grid(row=1, column=0)
-            tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0)
+            tk.Label(top, text='幀數', font=("Georgia", 12)).grid(row=0, column=0, padx=10, pady=10)
+            tk.Label(top, text='名稱', font=("Georgia", 12)).grid(row=1, column=0, padx=10, pady=10)
+            tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0, padx=10, pady=10)
             
-            
-            vcmd = (master.register(self.validate), 
-                '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
-            self.f = ttk.Entry(top, validate='key', validatecommand=vcmd, width=9)
+            self.f = ttk.Combobox(top, values=list(range(1, ind[1])))
+            self.f.current(ind[0] - 1)
             self.f.focus_force()
-            self.f.grid(row=0, column=1)
-            self.n = ttk.Combobox(top, values = name)
+            self.f.grid(row=0, column=1, padx=10, pady=10, sticky='news')
+            self.f.bind('<Return>', lambda event: self.cleanup())
+            self.n = ttk.Combobox(top, values=name)
             self.n.current(0)
-            self.n.grid(row=1, column=1)
-            self.b = ttk.Combobox(top, values = ['Attack', 'Wrestle', 'Chase', 'Escape'])
+            self.n.grid(row=1, column=1, padx=10, pady=10, sticky='news')
+            self.n.bind('<Return>', lambda event: self.cleanup())
+            self.b = ttk.Combobox(top, values=['Attack', 'Wrestle', 'Chase', 'Escape'])
             self.b.current(0)
-            self.b.grid(row=2, column=1)
-
+            self.b.grid(row=2, column=1, padx=10, pady=10, sticky='news')
+            self.b.bind('<Return>', lambda event: self.cleanup())
             
             bt = ttk.Button(top,text='Ok',command=self.cleanup, width=5)
-            bt.grid(row=4, column=0, columnspan=2, sticky='w')
+            bt.grid(row=4, column=0, columnspan=2, sticky='news', padx=10, pady=10)
 
-            # top.update_idletasks()
-            # width = top.winfo_reqwidth() + 10
-            # height = top.winfo_reqheight() + 10
-            # x = (top.winfo_screenwidth() // 2.25) - (width // 2)
-            # y = (top.winfo_screenheight() // 2) - (height // 2)
-            # top.geometry('+%d+%d' % (x, y))
-            # top.geometry('260x120')
+            top.update_idletasks()
+            width = top.winfo_reqwidth() + 10
+            height = top.winfo_reqheight() + 10
+            x = (top.winfo_screenwidth() // 2) - (width // 2)
+            y = (top.winfo_screenheight() // 2) - (height // 2)
+            top.geometry('+%d+%d' % (x, y))
+            top.geometry('240x180')
 
             top.bind('<Escape>', lambda event: top.destroy())
 
-            # pending; bind return, a decent name judge
         def cleanup(self):
             self.value = [self.f.get(), self.n.get(), self.b.get()]
             print(self.value)
             self.top.destroy()
-
-        def validate(self, action, index, value_if_allowed,
-                           prior_value, text, validation_type, trigger_type, widget_name):
-            if text in '0123456789':
-                try:
-                    float(value_if_allowed)
-                    return True
-                except ValueError:
-                    return False
-            else:
-                return False
         
     class popupEntry(object):
 

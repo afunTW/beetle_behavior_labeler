@@ -8,7 +8,7 @@ class KeyHandler(object):
         if self.video_path is not None:
             sel_items = self.tv.selection() if item is None else item
             if sel_items:
-                popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()))
+                popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame))
                 self.parent.wait_window(popup.top)
                 sel_item = sel_items[0]
                 try:
