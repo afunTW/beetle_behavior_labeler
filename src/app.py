@@ -178,7 +178,7 @@ class Labeler(KeyHandler, Interface, Utils):
         
         self.tv.configure(yscrollcommand=vsb.set)
         
-        for i, v in enumerate([('1', 'A', 'chase'), ('2', 'B', 'escape'), ('100', 'C', 'attack')]):
+        for i, v in enumerate([('1', 'A', 'Chase'), ('2', 'B', 'Escape'), ('100', 'C', 'Attack')]):
             self.tv.insert('', 'end', i, values=v)
 
         self.tv.bind('<Double-Button-1>', self.tvitem_click)

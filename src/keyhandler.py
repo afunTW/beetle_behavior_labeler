@@ -8,7 +8,7 @@ class KeyHandler(object):
         if self.video_path is not None:
             sel_items = self.tv.selection() if item is None else item
             if sel_items:
-                popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame))
+                popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame), tv=self.tv)
                 self.parent.wait_window(popup.top)
                 sel_item = sel_items[0]
                 try:
@@ -42,6 +42,8 @@ class KeyHandler(object):
 
     # add behavior record
     def on_add(self, event=None):
+        popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame), tv=self.tv)
+        
         print('add!')
 
     # delete behavior record

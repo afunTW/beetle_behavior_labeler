@@ -56,8 +56,10 @@ class Interface(object):
 
     class popupEdit(object):
 
-        def __init__(self, master, title, name, ind):
+        def __init__(self, master, title, name, ind, tv):
             top=self.top= tk.Toplevel(master)
+            self.tv = tv
+            self.title = title
             top.title(title)
             tk.Grid.rowconfigure(top, 0, weight=1)
             tk.Grid.columnconfigure(top, 0, weight=1)
@@ -96,8 +98,11 @@ class Interface(object):
             top.bind('<Escape>', lambda event: top.destroy())
 
         def cleanup(self):
-            self.value = [self.f.get(), self.n.get(), self.b.get()]
-            print(self.value)
+            self.value = (self.f.get(), self.n.get(), self.b.get())
+            if self.title == '新增':
+                self.tv.insert('', 'end', len(self.tv.get_children()), values=self.value)
+            elif self.title == '更改':
+                pass
             self.top.destroy()
         
     class popupEntry(object):
