@@ -18,21 +18,23 @@ class KeyHandler(object):
 
     def set_n_frame(self, s):
         v = int(float(s))
-        self.var_n_frame.set(v)
-        self.stop_ind = v
+        self.n_frame = v
 
     # move to previous frame
-    def on_left(self, event):
-        if self.stop_ind > 1:
-            self.stop_ind -= 1
-            self.var_n_frame.set(self.stop_ind)
-        else:
-            self.msg('Already the first frame!')
+    def on_left(self, event=None):
+        if self.video_path is not None:
+            if self.n_frame > 1:
+                self.n_frame -= 1
+            else:
+                self.msg('Already the first frame!')
     
     # move to next frame
-    def on_right(self, event):
-        if self.stop_ind == self.total_frame:
-            self.msg('Already the last frame!')
-        else:
-            self.stop_ind += 1
-            self.var_n_frame.set(self.stop_ind)
+    def on_right(self, event=None):
+        if self.video_path is not None:
+            if self.n_frame == self.total_frame:
+                self.msg('Already the last frame!')
+            else:
+                self.n_frame += 1
+
+    def on_return(self, event=None):
+        self.n_frame = self.stop_ind

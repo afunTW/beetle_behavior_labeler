@@ -12,7 +12,7 @@ class Utils(object):
                 traj = v['path']
 
                 try:
-                    ind = nframe.index(self.stop_ind)
+                    ind = nframe.index(self.n_frame)
                     p = tuple(traj[ind])
                     cv2.circle(self.__frame__, p, 10, (255, 255, 0), 1)
                 except Exception as e:

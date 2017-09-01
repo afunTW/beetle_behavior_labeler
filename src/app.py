@@ -12,7 +12,6 @@ from src.utils import Utils
 class Labeler(KeyHandler, Interface, Utils):
 
     def __init__(self, *args, **kwargs):
-        # tk.Frame.__init__(self, parent, *args, **kwargs)
         # basic variables
         self.video_path = None
         self.trajectory_path = None
@@ -25,6 +24,7 @@ class Labeler(KeyHandler, Interface, Utils):
         self.total_frame = None
 
         self.stop_ind = 1
+        self.n_frame = 1
         self.__frame__ = None
         self.__orig_frame__ = None
         self.__image__ = None
@@ -48,10 +48,10 @@ class Labeler(KeyHandler, Interface, Utils):
         style.configure("Treeview.Heading", font=('Georgia', 14))
         style.configure("Treeview", font=('Georgia', 12))
         style.configure("TButton", font=('Georgia', 12))
-        # style.configure(".", font=('Helvetica', 15))
 
         self.create_ui()
         self.update_display()
+        self.update_label()
 
         # display label ratio relative to whole window
         self.parent.update_idletasks()
@@ -72,9 +72,13 @@ class Labeler(KeyHandler, Interface, Utils):
         self.disply_l.after(20, self.update_display)
 
     def update_frame(self):
-        self.__video__.set(cv2.CAP_PROP_POS_FRAMES, self.stop_ind - 1)
+        self.__video__.set(cv2.CAP_PROP_POS_FRAMES, self.n_frame - 1)
         ok, self.__frame__ = self.__video__.read()
         self.__orig_frame__ = self.__frame__.copy()
+
+    def update_label(self):
+        self.var_n_frame.set(self.n_frame)
+        self.parent.after(10, self.update_label)
 
     def init_video(self):
         self.__video__ = cv2.VideoCapture(self.video_path)
@@ -99,30 +103,54 @@ class Labeler(KeyHandler, Interface, Utils):
         menu.add_cascade(label='Help', menu=help)
 
     def create_button(self):
+        buttons = []
         # button to click
-        b1 = ttk.Button(self.button_frame, text='previous (will change to icon)', command=lambda: print('button 1 was pressed'), style='TButton')
-        b1.grid(row=0, column=0, sticky='news', padx=5, pady=5)
-        b2 = ttk.Button(self.button_frame, text='next (will change to icon)', command=lambda: print('button 2 was pressed'), style='TButton')
-        b2.grid(row=0, column=1, sticky='news', padx=5, pady=5)
+        button_frame = tk.Frame(self.op_frame)
+        button_frame.grid(row=0, column=0)
+        return_img = ImageTk.PhotoImage(file='icons/return.png')
+        next_img = ImageTk.PhotoImage(file='icons/next.png')
+        next2_img = ImageTk.PhotoImage(file='icons/next2.png')
+        prev_img = ImageTk.PhotoImage(file='icons/prev.png')
+        prev2_img = ImageTk.PhotoImage(file='icons/prev2.png')
+
+        b_prev2 = ttk.Button(button_frame, image=prev2_img, command=self.on_left)
+        b_prev2.image = prev2_img
+        buttons.append(b_prev2)
+        b_prev = ttk.Button(button_frame, image=prev_img, command=self.on_left)
+        b_prev.image = prev_img
+        buttons.append(b_prev)
+        b_return = ttk.Button(button_frame, image=return_img, command=self.on_return)
+        b_return.image = return_img
+        buttons.append(b_return)
+        b_next = ttk.Button(button_frame, image=next_img, command=self.on_right)
+        b_next.image = next_img
+        buttons.append(b_next)
+        b_next2 = ttk.Button(button_frame, image=next2_img, command=self.on_right)
+        b_next2.image = next2_img
+        buttons.append(b_next2)
+
+        for i, b in enumerate(buttons):
+            b.grid(row=0, column=i, sticky='news', padx=10, pady=10)
+            b.config(cursor='hand2')
 
         # scale bar for n frame
         self.var_n_frame = tk.IntVar()
-        self.var_n_frame.set(self.stop_ind)
 
-        scale_frame = tk.Frame(self.button_frame)
-        scale_frame.grid(row=1, column=0, sticky='news', columnspan=4)
+        scale_frame = tk.Frame(self.op_frame)
+        scale_frame.grid(row=1, column=0, sticky='news')
 
+        scale_frame.grid_rowconfigure(0, weight=1)
         for i in range(3):
             scale_frame.grid_columnconfigure(i, weight=1)
 
         self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
-        self.label_n_frame_left.grid(row=1, column=0)
+        self.label_n_frame_left.grid(row=0, column=0)
         self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1250, command=self.set_n_frame)
-        self.scale_n_frame.set(self.stop_ind)
+        self.scale_n_frame.set(self.n_frame)
         self.scale_n_frame.state(['disabled'])
-        self.scale_n_frame.grid(row=1, column=1)
+        self.scale_n_frame.grid(row=0, column=1)
         self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
-        self.label_n_frame_right.grid(row=1, column=2)
+        self.label_n_frame_right.grid(row=0, column=2)
 
     def create_treeview(self):
         self.tv = ttk.Treeview(self.parent, height=20)
@@ -146,7 +174,6 @@ class Labeler(KeyHandler, Interface, Utils):
             self.tv.insert('', 'end', i, values=v)
 
         self.tv.bind('<Double-Button-1>', self.tvitem_click)
-        self.tv.state(['disabled'])
 
     def create_ui(self):
         
@@ -166,12 +193,11 @@ class Labeler(KeyHandler, Interface, Utils):
         self.disply_l.grid(row=0, column=0, sticky='news', padx=10, pady=10)
 
         # frame operation frame
-        self.button_frame = ttk.LabelFrame(self.display_frame)
-        self.button_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
-        for i in range(2):
-            self.button_frame.grid_rowconfigure(i, weight=1)
-            self.button_frame.grid_columnconfigure(i, weight=1)
-
+        # self.button_frame = ttk.LabelFrame(self.display_frame)
+        self.op_frame = tk.Frame(self.display_frame)
+        self.op_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
+        self.op_frame.grid_rowconfigure(0, weight=1)
+        self.op_frame.grid_columnconfigure(0, weight=1)
         self.create_button()
 
         # record operation frame
@@ -180,3 +206,4 @@ class Labeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Escape>', self.on_close)
         self.parent.bind('<Left>', self.on_left)
         self.parent.bind('<Right>', self.on_right)
+        self.parent.bind('<Return>', self.on_return)
