@@ -36,5 +36,15 @@ class KeyHandler(object):
             else:
                 self.n_frame += 1
 
+    # return to label frame index
     def on_return(self, event=None):
         self.n_frame = self.stop_ind
+
+    # add behavior record
+    def on_add(self, event=None):
+        print('add!')
+
+    # delete behavior record
+    def on_delete(self, event=None):
+        for v in self.tv.selection():
+            self.tv.delete(v)

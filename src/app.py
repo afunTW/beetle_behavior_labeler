@@ -112,6 +112,8 @@ class Labeler(KeyHandler, Interface, Utils):
         next2_img = ImageTk.PhotoImage(file='icons/next2.png')
         prev_img = ImageTk.PhotoImage(file='icons/prev.png')
         prev2_img = ImageTk.PhotoImage(file='icons/prev2.png')
+        add_img = ImageTk.PhotoImage(file='icons/add.png')
+        delete_img = ImageTk.PhotoImage(file='icons/delete.png')
 
         b_prev2 = ttk.Button(button_frame, image=prev2_img, command=self.on_left)
         b_prev2.image = prev2_img
@@ -128,6 +130,12 @@ class Labeler(KeyHandler, Interface, Utils):
         b_next2 = ttk.Button(button_frame, image=next2_img, command=self.on_right)
         b_next2.image = next2_img
         buttons.append(b_next2)
+        b_add = ttk.Button(button_frame, image=add_img, command=self.on_add)
+        b_add.image = add_img
+        buttons.append(b_add)
+        b_delete = ttk.Button(button_frame, image=delete_img, command=self.on_delete)
+        b_delete.image = delete_img
+        buttons.append(b_delete)
 
         for i, b in enumerate(buttons):
             b.grid(row=0, column=i, sticky='news', padx=10, pady=10)
@@ -207,3 +215,5 @@ class Labeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Left>', self.on_left)
         self.parent.bind('<Right>', self.on_right)
         self.parent.bind('<Return>', self.on_return)
+        self.parent.bind('<a>', self.on_add)
+        self.parent.bind('<d>', self.on_delete)
