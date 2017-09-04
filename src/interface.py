@@ -35,7 +35,8 @@ class Interface(object):
             self.scale_n_frame.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
             self.label_n_frame_right['text'] = self.total_frame
-            self.stop_ind = 1
+            # self.stop_ind = 1
+            self.get_stop_ind()
 
     def get_path(self):
         path = askopenfilename(title='請選擇影像路徑', filetypes=[('video file (*.avi;)', '*.avi;')])

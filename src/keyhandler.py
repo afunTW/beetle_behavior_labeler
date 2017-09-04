@@ -50,3 +50,19 @@ class KeyHandler(object):
     def on_delete(self, event=None):
         for v in self.tv.selection():
             self.tv.delete(v)
+
+    # move to next stop frame index
+    def on_next(self, event=None):
+        self.get_stop_ind(direct='next')
+    
+    # move to previous stop frame index
+    def on_prev(self, event=None):
+        self.get_stop_ind(direct='prev')
+
+    def get_stop_ind(self, direct='next'):
+        if direct == 'next' and (self.stop_ind + 20) <= self.total_frame:
+            self.stop_ind  += 20
+        elif direct == 'prev' and (self.stop_ind - 20) >= 1:
+            self.stop_ind -= 20
+        self.n_frame = self.stop_ind
+        pass

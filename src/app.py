@@ -47,9 +47,10 @@ class Labeler(KeyHandler, Interface, Utils):
         style = ttk.Style()
         style.configure("Treeview.Heading", font=('Georgia', 14))
         style.configure("Treeview", font=('Georgia', 12))
-        style.configure("TButton", font=('Georgia', 12))
 
         self.create_ui()
+
+        # update
         self.update_display()
         self.update_label()
 
@@ -60,6 +61,7 @@ class Labeler(KeyHandler, Interface, Utils):
         
         # maximize the window
         self.parent.state('zoomed')
+
         self.parent.mainloop()
 
     def update_display(self):
@@ -115,7 +117,7 @@ class Labeler(KeyHandler, Interface, Utils):
         add_img = ImageTk.PhotoImage(file='icons/add.png')
         delete_img = ImageTk.PhotoImage(file='icons/delete.png')
 
-        b_prev2 = ttk.Button(button_frame, image=prev2_img, command=self.on_left)
+        b_prev2 = ttk.Button(button_frame, image=prev2_img, command=self.on_prev)
         b_prev2.image = prev2_img
         buttons.append(b_prev2)
         b_prev = ttk.Button(button_frame, image=prev_img, command=self.on_left)
@@ -127,7 +129,7 @@ class Labeler(KeyHandler, Interface, Utils):
         b_next = ttk.Button(button_frame, image=next_img, command=self.on_right)
         b_next.image = next_img
         buttons.append(b_next)
-        b_next2 = ttk.Button(button_frame, image=next2_img, command=self.on_right)
+        b_next2 = ttk.Button(button_frame, image=next2_img, command=self.on_next)
         b_next2.image = next2_img
         buttons.append(b_next2)
         b_add = ttk.Button(button_frame, image=add_img, command=self.on_add)
@@ -215,5 +217,7 @@ class Labeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Left>', self.on_left)
         self.parent.bind('<Right>', self.on_right)
         self.parent.bind('<Return>', self.on_return)
+        self.parent.bind('<Down>', self.on_next)
+        self.parent.bind('<Up>', self.on_prev)
         self.parent.bind('<a>', self.on_add)
         self.parent.bind('<d>', self.on_delete)
