@@ -61,6 +61,8 @@ class Interface(object):
             top=self.top= tk.Toplevel(master)
             self.tv = tv
             self.title = title
+            bev = ['Attack', 'Wrestle', 'Chase', 'Escape']
+
             top.title(title)
             tk.Grid.rowconfigure(top, 0, weight=1)
             tk.Grid.columnconfigure(top, 0, weight=1)
@@ -70,18 +72,22 @@ class Interface(object):
             tk.Label(top, text='幀數', font=("Georgia", 12)).grid(row=0, column=0, padx=10, pady=10)
             tk.Label(top, text='名稱', font=("Georgia", 12)).grid(row=1, column=0, padx=10, pady=10)
             tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0, padx=10, pady=10)
+
+            f_ind = ind[0] if title == '新增' else self.tv.item(self.tv.selection()[0])['values'][0]
+            n_ind = 0 if title == '新增' else name.index(self.tv.item(self.tv.selection()[0])['values'][1])
+            b_ind = 0 if title == '新增' else bev.index(self.tv.item(self.tv.selection()[0])['values'][2])
             
             self.f = ttk.Combobox(top, values=list(range(1, ind[1])))
-            self.f.current(ind[0] - 1)
+            self.f.current(f_ind - 1)
             self.f.focus_force()
             self.f.grid(row=0, column=1, padx=10, pady=10, sticky='news')
             self.f.bind('<Return>', lambda event: self.cleanup())
             self.n = ttk.Combobox(top, values=name)
-            self.n.current(0)
+            self.n.current(n_ind)
             self.n.grid(row=1, column=1, padx=10, pady=10, sticky='news')
             self.n.bind('<Return>', lambda event: self.cleanup())
-            self.b = ttk.Combobox(top, values=['Attack', 'Wrestle', 'Chase', 'Escape'])
-            self.b.current(0)
+            self.b = ttk.Combobox(top, values=bev)
+            self.b.current(b_ind)
             self.b.grid(row=2, column=1, padx=10, pady=10, sticky='news')
             self.b.bind('<Return>', lambda event: self.cleanup())
             

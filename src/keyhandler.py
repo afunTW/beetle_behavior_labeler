@@ -1,5 +1,8 @@
 # import tkinter as tk
 # from tkinter import ttk
+import pandas as pd
+from tkinter.filedialog import asksaveasfilename
+
 from src.interface import Interface
 
 class KeyHandler(object):
@@ -12,7 +15,8 @@ class KeyHandler(object):
                 self.parent.wait_window(popup.top)
                 sel_item = sel_items[0]
                 try:
-                    print(popup.value)
+                    self.tv.item(sel_item, values=popup.value)
+                    # print(popup.value)
                 except:
                     pass
 
@@ -43,8 +47,6 @@ class KeyHandler(object):
     # add behavior record
     def on_add(self, event=None):
         popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame), tv=self.tv)
-        
-        print('add!')
 
     # delete behavior record
     def on_delete(self, event=None):
@@ -70,7 +72,27 @@ class KeyHandler(object):
             self.stop_ind  += 20
         elif direct == 'prev' and (self.stop_ind - 20) >= 1:
             self.stop_ind -= 20
-            
+
         self.n_frame = self.stop_ind
         # popup label box
         self.on_add()
+
+    def on_save(self, event=None):
+        {'frame_index': [], 'name': [], 'behavior': []}
+        values = [self.tv.item(child)['values'] for child in self.tv.get_children()]
+        self.__results_dict__['frame_index'] = list(map(lambda x: x[0], values))
+        self.__results_dict__['name'] = list(map(lambda x: x[1], values))
+        self.__results_dict__['behavior'] = list(map(lambda x: x[2], values))
+
+        df = pd.DataFrame(self.__results_dict__)
+        df = df.reindex_axis(['frame_index', 'name', 'behavior'], axis=1)
+        root = '/'.join(self.video_path.split('/')[:-1])
+        filename = self.video_path.split('/')[-1].split('.avi')[0] + '_behavior_record'
+        filename = asksaveasfilename(initialdir='%s' % (root), 
+                                     defaultextension=".csv", 
+                                     filetypes=(("CSV (逗號分隔)", "*.csv"),("All Files", "*.*")), 
+                                     initialfile=filename, 
+                                     title='存檔')
+        df.to_csv(filename, index=False)
+
+

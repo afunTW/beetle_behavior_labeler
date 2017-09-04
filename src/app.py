@@ -17,6 +17,7 @@ class Labeler(KeyHandler, Interface, Utils):
         self.trajectory_path = None
         self.__video__ = None
         self.__trajectory__ = None
+        self.__results_dict__ = dict()
         self.width = 1280
         self.height = 720
         self.fps = None
@@ -97,7 +98,7 @@ class Labeler(KeyHandler, Interface, Utils):
 
         file = tk.Menu(menu)
         file.add_command(label='載入新影像', command=self.on_load)
-        file.add_command(label='儲存操作', command=lambda: print('save'))
+        file.add_command(label='儲存操作', command=self.on_save)
         menu.add_cascade(label='File', menu=file)
 
         help = tk.Menu(menu)
