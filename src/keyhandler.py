@@ -56,6 +56,13 @@ class KeyHandler(object):
                     popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
                     self.parent.wait_window(popup.top)
                     # self.k2 = None
+            elif self.k2 is not None:
+                popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
+                self.parent.wait_window(popup.top)
+                if self.k1 is not None:
+                    popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
+                    self.parent.wait_window(popup.top)
+
         else:
             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
             self.parent.wait_window(popup.top)
@@ -74,21 +81,22 @@ class KeyHandler(object):
         self.get_stop_ind(direct='prev')
 
     # logic to get stop frame index
-    def get_stop_ind(self, direct='next'):
+    def get_stop_ind(self, direct='next', n=None):
         pair = combinations(sorted(self.__trajectory__.keys()), 2)
+        n = self.n_frame if n is None else n
         for k1, k2 in pair:
             v1 = self.__trajectory__[k1]
             v2 = self.__trajectory__[k2]
 
             try:
                 if direct == 'next':
-                    ind_1 = min([v1['n_frame'].index(f) for f in v1['n_frame'] if f >= self.n_frame])
-                    ind_2 = min([v2['n_frame'].index(f) for f in v2['n_frame'] if f >= self.n_frame])
+                    ind_1 = min([v1['n_frame'].index(f) for f in v1['n_frame'] if f > n])
+                    ind_2 = min([v2['n_frame'].index(f) for f in v2['n_frame'] if f > n])
                     center_1 = v1['path'][ind_1:]
                     center_2 = v2['path'][ind_2:]
                 elif direct == 'prev':
-                    ind_1 = max([v1['n_frame'].index(f) for f in v1['n_frame'] if f < self.n_frame])
-                    ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < self.n_frame])
+                    ind_1 = max([v1['n_frame'].index(f) for f in v1['n_frame'] if f < n])
+                    ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < n])
                     center_1 = v1['path'][:(ind_1)]
                     center_2 = v2['path'][:(ind_2)]
                 print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
@@ -146,11 +154,33 @@ class KeyHandler(object):
             self.n_frame = self.stop_ind
 
             values = [self.tv.item(child)['values'] for child in self.tv.get_children()]
-            if self.n_frame not in list(map(lambda x: x[0], values)):
-                # popup label box
-                self.k1 = k1
-                self.k2 = k2
-                self.on_add(sug_name=k1)
+            try:
+                nframes = list(map(lambda x: x[0], values))
+                flag = nframes.count(self.n_frame)
+                if flag == 0:
+                    self.k1 = k1
+                    self.k2 = k2
+                    self.on_add(sug_name=k1)
+                elif flag == 1:
+                    ind = nframes.index(self.n_frame)
+                    try:
+                        name = list(map(lambda x: x[1], values))[ind]
+                    except Exception as e:
+                        print(e)
+                    if k1 == name:
+                        self.k2 = k2
+                        self.k1 = None
+                        self.on_add(sug_name=k2)
+                    elif k2 == name:
+                        self.k1 = k1
+                        self.k2 = None
+                        self.on_add(sug_name=k1)
+
+                elif flag >= 2:
+                    self.get_stop_ind(direct=direct, n=self.n_frame)
+            except Exception as e:
+                print(e)
+                pass
         else:
             self.msg('沒有埋葬蟲相鄰的 frame 了')
 
