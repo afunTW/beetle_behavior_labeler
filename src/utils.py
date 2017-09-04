@@ -8,6 +8,18 @@ class Utils(object):
     def draw(self):
         self.__frame__ = self.__orig_frame__.copy()
         if self.video_path is not None:
+            all_centers = []
+            for k in sorted(self.__trajectory__.keys()):
+                v = self.__trajectory__[k]
+                nframe = v['n_frame']
+                traj = v['path']
+                try:
+                    ind = nframe.index(self.n_frame)
+                    x_c, y_c = tuple(traj[ind])
+                    all_centers.append((k, (x_c, y_c)))
+                except:
+                    pass
+
             for i, k in enumerate(sorted(self.__trajectory__.keys())):
                 v = self.__trajectory__[k]
                 nframe = v['n_frame']
@@ -20,7 +32,13 @@ class Utils(object):
                     w, h = tuple(wh[ind])
                     xmin, xmax = int(x_c - w/2.0), int(x_c + w/2.0)
                     ymin, ymax = int(y_c - h/2.0), int(y_c + h/2.0)
-                    cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), c, 1)
+
+                    if any([np.linalg.norm(np.array((x_c, y_c)) - np.array(v[1])) <= 50 for v in all_centers if v[0] != k]):
+                        thickness = 2
+                    else:
+                        thickness = 1
+
+                    cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), c, thickness)
 
                     if ymin < 50:
                         y_t = ymax + 20

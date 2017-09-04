@@ -51,11 +51,11 @@ class KeyHandler(object):
             if self.k1 is not None:
                 popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
                 self.parent.wait_window(popup.top)
-                self.k1 = None
+                # self.k1 = None
                 if self.k2 is not None:
                     popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
                     self.parent.wait_window(popup.top)
-                    self.k2 = None
+                    # self.k2 = None
         else:
             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
             self.parent.wait_window(popup.top)
