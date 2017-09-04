@@ -2,18 +2,24 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 
+COLOR = [(50, 205, 50), (255, 191, 0), (0, 255, 255), (0, 165, 255), (211, 85, 186), (255, 102, 255), (255, 255, 0), (0, 0, 0), (100, 10, 255), (255, 255, 255)]
 class Utils(object):
 
     def draw(self):
         self.__frame__ = self.__orig_frame__.copy()
         if self.video_path is not None:
-            for k, v in self.__trajectory__.items():
+            for i, (k, v) in enumerate(self.__trajectory__.items()):
                 nframe = v['n_frame']
                 traj = v['path']
+                wh = v['wh']
 
                 try:
                     ind = nframe.index(self.n_frame)
-                    p = tuple(traj[ind])
+                    x_c, y_c = tuple(traj[ind])
+                    w, h = tuple(wh[ind])
+                    xmin, xmax = int(x_c - w/2.0), int(x_c + w/2.0)
+                    ymin, ymax = int(y_c - h/2.0), int(y_c + h/2.0)
+                    cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), COLOR[i], 1)
                     cv2.circle(self.__frame__, p, 10, (255, 255, 0), 1)
                 except Exception as e:
                     pass
