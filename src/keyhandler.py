@@ -59,10 +59,18 @@ class KeyHandler(object):
     def on_prev(self, event=None):
         self.get_stop_ind(direct='prev')
 
+    # logic to get stop frame index
     def get_stop_ind(self, direct='next'):
+        for i, (k, v) in enumerate(self.__trajectory__.items()):
+            nframe = v['n_frame']
+            traj = v['path']
+            wh = v['wh']
+
         if direct == 'next' and (self.stop_ind + 20) <= self.total_frame:
             self.stop_ind  += 20
         elif direct == 'prev' and (self.stop_ind - 20) >= 1:
             self.stop_ind -= 20
+            
         self.n_frame = self.stop_ind
-        pass
+        # popup label box
+        self.on_add()

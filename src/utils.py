@@ -12,15 +12,27 @@ class Utils(object):
                 nframe = v['n_frame']
                 traj = v['path']
                 wh = v['wh']
-
+                c = COLOR[i]
                 try:
                     ind = nframe.index(self.n_frame)
                     x_c, y_c = tuple(traj[ind])
                     w, h = tuple(wh[ind])
                     xmin, xmax = int(x_c - w/2.0), int(x_c + w/2.0)
                     ymin, ymax = int(y_c - h/2.0), int(y_c + h/2.0)
-                    cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), COLOR[i], 1)
-                    cv2.circle(self.__frame__, p, 10, (255, 255, 0), 1)
+                    cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), c, 1)
+
+                    if ymin < 50:
+                        y_t = ymax + 20
+                    else:
+                        y_t = ymin - 10
+
+                    if xmin < 50:
+                        x_t = xmax + 20
+                    else:
+                        x_t = xmin - 10
+
+                    cv2.putText(self.__frame__, k, (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, (255, 255, 255), 3)
+                    cv2.putText(self.__frame__, k, (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, c, 1)
                 except Exception as e:
                     pass
 
@@ -34,7 +46,6 @@ class Utils(object):
             nw = int(shape[1] * self._c_width)
             nh = int(shape[0] * nw / shape[1])
             newsize = (nw, nh)
-            # newsize = (int(shape[1] * self._c_width * 0.96), int(shape[0] * self._c_height * 0.9))
             self.__frame__ = cv2.resize(self.__frame__, newsize)
 
         self.__frame__ = cv2.cvtColor(self.__frame__, cv2.COLOR_BGR2RGB)
