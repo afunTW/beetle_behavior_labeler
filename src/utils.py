@@ -8,7 +8,8 @@ class Utils(object):
     def draw(self):
         self.__frame__ = self.__orig_frame__.copy()
         if self.video_path is not None:
-            for i, (k, v) in enumerate(self.__trajectory__.items()):
+            for i, k in enumerate(sorted(self.__trajectory__.keys())):
+                v = self.__trajectory__[k]
                 nframe = v['n_frame']
                 traj = v['path']
                 wh = v['wh']

@@ -74,7 +74,12 @@ class Interface(object):
             tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0, padx=10, pady=10)
 
             f_ind = ind[0] if title == '新增' else self.tv.item(self.tv.selection()[0])['values'][0]
-            n_ind = 0 if title == '新增' else name.index(self.tv.item(self.tv.selection()[0])['values'][1])
+            if title == '新增' and ind[2] is not None:
+                n_ind = name.index(ind[2])
+            elif ind[2] is None:
+                n_ind = 0
+            else:
+                n_ind = name.index(self.tv.item(self.tv.selection()[0])['values'][2])
             b_ind = 0 if title == '新增' else bev.index(self.tv.item(self.tv.selection()[0])['values'][2])
             
             self.f = ttk.Combobox(top, values=list(range(1, ind[1])))
@@ -94,7 +99,6 @@ class Interface(object):
             bt = ttk.Button(top,text='Ok',command=self.cleanup, width=5)
             bt.grid(row=4, column=0, columnspan=2, sticky='news', padx=10, pady=10)
 
-            top.update_idletasks()
             width = top.winfo_reqwidth() + 10
             height = top.winfo_reqheight() + 10
             x = (top.winfo_screenwidth() // 2) - (width // 2)

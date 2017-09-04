@@ -33,6 +33,8 @@ class Labeler(KeyHandler, Interface, Utils):
         self.scale_n_frame = None
         self.label_n_frame_left = None
         self.label_n_frame_right = None
+        self.k1 = None
+        self.k2 = None
 
         # UI
         self.parent = tk.Tk()
@@ -101,9 +103,9 @@ class Labeler(KeyHandler, Interface, Utils):
         file.add_command(label='儲存操作', command=self.on_save)
         menu.add_cascade(label='File', menu=file)
 
-        help = tk.Menu(menu)
-        help.add_command(label='設定', command=lambda: print('settings'))
-        menu.add_cascade(label='Help', menu=help)
+        # help = tk.Menu(menu)
+        # help.add_command(label='設定', command=lambda: print('settings'))
+        # menu.add_cascade(label='Help', menu=help)
 
     def create_button(self):
         buttons = []
@@ -112,9 +114,9 @@ class Labeler(KeyHandler, Interface, Utils):
         button_frame.grid(row=0, column=0)
         return_img = ImageTk.PhotoImage(file='icons/return.png')
         next_img = ImageTk.PhotoImage(file='icons/next.png')
-        next2_img = ImageTk.PhotoImage(file='icons/next2.png')
+        next2_img = ImageTk.PhotoImage(file='icons/down.png')
         prev_img = ImageTk.PhotoImage(file='icons/prev.png')
-        prev2_img = ImageTk.PhotoImage(file='icons/prev2.png')
+        prev2_img = ImageTk.PhotoImage(file='icons/up.png')
         add_img = ImageTk.PhotoImage(file='icons/add.png')
         delete_img = ImageTk.PhotoImage(file='icons/delete.png')
 
