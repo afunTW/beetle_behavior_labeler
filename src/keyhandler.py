@@ -82,13 +82,13 @@ class KeyHandler(object):
 
             try:
                 if direct == 'next':
-                    ind_1 = min([v1['n_frame'].index(f) for f in v1['n_frame'] if f > self.stop_ind])
-                    ind_2 = min([v2['n_frame'].index(f) for f in v2['n_frame'] if f > self.stop_ind])
+                    ind_1 = min([v1['n_frame'].index(f) for f in v1['n_frame'] if f >= self.n_frame])
+                    ind_2 = min([v2['n_frame'].index(f) for f in v2['n_frame'] if f >= self.n_frame])
                     center_1 = v1['path'][ind_1:]
                     center_2 = v2['path'][ind_2:]
                 elif direct == 'prev':
-                    ind_1 = max([v1['n_frame'].index(f) for f in v1['n_frame'] if f < self.stop_ind])
-                    ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < self.stop_ind])
+                    ind_1 = max([v1['n_frame'].index(f) for f in v1['n_frame'] if f < self.n_frame])
+                    ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < self.n_frame])
                     center_1 = v1['path'][:(ind_1)]
                     center_2 = v2['path'][:(ind_2)]
                 print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
