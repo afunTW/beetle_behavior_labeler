@@ -82,7 +82,21 @@ class Labeler(KeyHandler, Interface, Utils):
         self.__orig_frame__ = self.__frame__.copy()
 
     def update_label(self):
-        self.var_n_frame.set(self.n_frame)
+        # if int(float(self.var_n_frame.get())) != self.n_frame:
+        # if str(self.label_n_frame_left.focus_get().__class__) != "<class 'tkinter.ttk.Entry'>":
+        if self.video_path is not None:
+            self.var_n_frame.set(self.n_frame)
+            self.scale_n_frame.set(self.n_frame)
+
+            text_video_name = self.video_path.split('/')[-1]
+            sec = round(self.n_frame / self.fps, 2)
+            m, s = divmod(sec, 60)
+            h, m = divmod(m, 60)
+            text_time = "%d:%02d:%02d" % (h, m, s)
+            
+            self.label_video_name.configure(text=text_video_name)
+            self.label_time.configure(text=text_time)
+
         self.parent.after(10, self.update_label)
 
     def init_video(self):
@@ -146,6 +160,8 @@ class Labeler(KeyHandler, Interface, Utils):
             b.grid(row=0, column=i, sticky='news', padx=10, pady=10)
             b.config(cursor='hand2')
 
+        vcmd = (self.parent.register(self.validate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
+
         # scale bar for n frame
         self.var_n_frame = tk.IntVar()
 
@@ -156,8 +172,10 @@ class Labeler(KeyHandler, Interface, Utils):
         for i in range(3):
             scale_frame.grid_columnconfigure(i, weight=1)
 
+        # self.label_n_frame_left = ttk.Entry(scale_frame, textvariable=self.var_n_frame, width=10, justify='right', vcmd=vcmd, validate='key')
+        # self.label_n_frame_left.bind('<Return>', self.set_n_frame_2)
         self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
-        self.label_n_frame_left.grid(row=0, column=0)
+        self.label_n_frame_left.grid(row=0, column=0, padx=10, sticky='news')
         self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1250, command=self.set_n_frame)
         self.scale_n_frame.set(self.n_frame)
         self.scale_n_frame.state(['disabled'])
@@ -165,8 +183,24 @@ class Labeler(KeyHandler, Interface, Utils):
         self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
         self.label_n_frame_right.grid(row=0, column=2)
 
+    def create_info(self):
+        text_video_name = '-----'
+        text_time = '--:--:--'
+
+        info_label_frame = ttk.LabelFrame(self.info_frame, text='影像信息')
+        info_label_frame.grid(row=0, column=0, sticky='news')
+
+        label_video_name = ttk.Label(info_label_frame, text='影像檔名: ')
+        label_video_name.grid(row=0, column=0, sticky='w')
+        self.label_video_name = ttk.Label(info_label_frame, text=text_video_name)
+        self.label_video_name.grid(row=0, column=1, sticky='w')
+        label_time = ttk.Label(info_label_frame, text='影像時間: ')
+        label_time.grid(row=1, column=0, sticky='w')
+        self.label_time = ttk.Label(info_label_frame, text=text_time)
+        self.label_time.grid(row=1, column=1, sticky='w')
+
     def create_treeview(self):
-        self.tv = ttk.Treeview(self.parent, height=20)
+        self.tv = ttk.Treeview(self.info_frame, height=20)
         self.tv['columns'] = ('f', 'n', 'b')
         self.tv.heading('#0', text='', anchor='center')
         self.tv.column('#0', anchor='w', width=0)
@@ -176,10 +210,10 @@ class Labeler(KeyHandler, Interface, Utils):
         self.tv.column('n', anchor='center', width=120)
         self.tv.heading('b', text='行為')
         self.tv.column('b', anchor='center', width=150)
-        self.tv.grid(row=0, column=1, rowspan=2, sticky='news', pady=10)
+        self.tv.grid(row=1, column=0, rowspan=2, sticky='news', pady=10)
         
-        vsb = ttk.Scrollbar(self.parent, orient="vertical", command=self.tv.yview)
-        vsb.grid(row=0, column=2, rowspan=2, sticky='news', pady=10)
+        vsb = ttk.Scrollbar(self.info_frame, orient="vertical", command=self.tv.yview)
+        vsb.grid(row=1, column=1, rowspan=2, sticky='news', pady=10)
         
         self.tv.configure(yscrollcommand=vsb.set)
         self.tv.bind('<Double-Button-1>', self.tvitem_click)
@@ -209,6 +243,15 @@ class Labeler(KeyHandler, Interface, Utils):
         self.op_frame.grid_columnconfigure(0, weight=1)
         self.create_button()
 
+        self.info_frame = tk.Frame(self.parent)
+        self.info_frame.grid(row=0, column=1, rowspan=2, sticky='news', pady=10)
+        self.info_frame.grid_columnconfigure(0, weight=1)
+        self.info_frame.grid_rowconfigure(1, weight=1)
+        self.info_frame.grid_columnconfigure(1, weight=1)
+
+        # display info
+        self.create_info()
+
         # record operation frame
         self.create_treeview()
 
@@ -218,5 +261,6 @@ class Labeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Return>', self.on_return)
         self.parent.bind('<Down>', self.on_next)
         self.parent.bind('<Up>', self.on_prev)
+        self.tv.bind('<Control-a>', self.on_select_all)
         self.parent.bind('<a>', self.on_add)
         self.parent.bind('<d>', self.on_delete)

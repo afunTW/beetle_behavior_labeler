@@ -25,6 +25,9 @@ class KeyHandler(object):
         v = int(float(s))
         self.n_frame = v
 
+    def set_n_frame_2(self, event):
+        self.n_frame = int(float(self.var_n_frame.get()))
+
     # move to previous frame
     def on_left(self, event=None):
         if self.video_path is not None:
@@ -47,25 +50,26 @@ class KeyHandler(object):
 
     # add behavior record
     def on_add(self, event=None, sug_name=None):
-        if sug_name is not None:
-            if self.k1 is not None:
-                popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
-                self.parent.wait_window(popup.top)
-                # self.k1 = None
-                if self.k2 is not None:
-                    popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-                    self.parent.wait_window(popup.top)
-                    # self.k2 = None
-            elif self.k2 is not None:
-                popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-                self.parent.wait_window(popup.top)
+        if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
+            if sug_name is not None:
                 if self.k1 is not None:
                     popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
                     self.parent.wait_window(popup.top)
+                    # self.k1 = None
+                    if self.k2 is not None:
+                        popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
+                        self.parent.wait_window(popup.top)
+                        # self.k2 = None
+                elif self.k2 is not None:
+                    popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
+                    self.parent.wait_window(popup.top)
+                    if self.k1 is not None:
+                        popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
+                        self.parent.wait_window(popup.top)
 
-        else:
-            popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
-            self.parent.wait_window(popup.top)
+            else:
+                popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
+                self.parent.wait_window(popup.top)
 
     # delete behavior record
     def on_delete(self, event=None):
@@ -99,7 +103,7 @@ class KeyHandler(object):
                     ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < n])
                     center_1 = v1['path'][:(ind_1)]
                     center_2 = v2['path'][:(ind_2)]
-                print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
+                # print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
             except:
                 ind_1, ind_2 = None, None
 
@@ -111,7 +115,7 @@ class KeyHandler(object):
                     try:
                         f_1 = v1['n_frame'][ind_1]
                         f_2 = v2['n_frame'][ind_2]
-                        print('Nframe: ', f_1, f_2)
+                        # print('Nframe: ', f_1, f_2)
                         if f_1 > f_2:
                             if direct == 'next':
                                 ind_2 += 1
@@ -128,7 +132,7 @@ class KeyHandler(object):
                             c_1 = v1['path'][ind_1]
                             c_2 = v2['path'][ind_2]
                             dist = np.linalg.norm(np.array(c_1) - np.array(c_2))
-                            print(dist)
+                            # print(dist)
                             if dist <= 50:
                                 brk = True
                                 self.stop_ind = f_1                       
@@ -151,18 +155,19 @@ class KeyHandler(object):
                     break
 
         if brk:
-            self.n_frame = self.stop_ind
+            # print('come', '\n'*10)
 
             values = [self.tv.item(child)['values'] for child in self.tv.get_children()]
             try:
                 nframes = list(map(lambda x: x[0], values))
-                flag = nframes.count(self.n_frame)
+                flag = nframes.count(self.stop_ind)
                 if flag == 0:
                     self.k1 = k1
                     self.k2 = k2
+                    self.n_frame = self.stop_ind
                     self.on_add(sug_name=k1)
                 elif flag == 1:
-                    ind = nframes.index(self.n_frame)
+                    ind = nframes.index(self.stop_ind)
                     try:
                         name = list(map(lambda x: x[1], values))[ind]
                     except Exception as e:
@@ -170,19 +175,27 @@ class KeyHandler(object):
                     if k1 == name:
                         self.k2 = k2
                         self.k1 = None
+                        self.n_frame = self.stop_ind
                         self.on_add(sug_name=k2)
                     elif k2 == name:
                         self.k1 = k1
                         self.k2 = None
+                        self.n_frame = self.stop_ind
                         self.on_add(sug_name=k1)
 
                 elif flag >= 2:
-                    self.get_stop_ind(direct=direct, n=self.n_frame)
+                    print('flag2', "\n"*10)
+                    self.get_stop_ind(direct=direct, n=self.stop_ind)
             except Exception as e:
                 print(e)
                 pass
         else:
-            self.msg('沒有埋葬蟲相鄰的 frame 了')
+            self.msg('%s沒有埋葬蟲相鄰的 frame 了。' % "往前" if direct=='prev' else "往後")
+
+    def on_select_all(self, event=None):
+        if self.video_path is not None:
+            for x in self.tv.get_children():
+                self.tv.selection_add(x)
 
     def on_save(self, event=None):
         {'frame_index': [], 'name': [], 'behavior': []}
