@@ -91,6 +91,7 @@ class Labeler(KeyHandler, Interface, Utils):
             try:
                 self.var_n_frame.set(self.n_frame)
                 self.scale_n_frame.set(self.n_frame)
+                self.label_n_frame_left.config(text='%s/%s' % (self.n_frame, self.total_frame))
 
                 text_video_name = self.video_path.split('/')[-1]
                 sec = round(self.n_frame / self.fps, 2)
@@ -103,7 +104,7 @@ class Labeler(KeyHandler, Interface, Utils):
             except:
                 pass
 
-        self.parent.after(10, self.update_label)
+        self.disply_l.after(10, self.update_label)
 
     def init_video(self):
         self.__video__ = cv2.VideoCapture(self.video_path)
@@ -180,14 +181,15 @@ class Labeler(KeyHandler, Interface, Utils):
 
         # self.label_n_frame_left = ttk.Entry(scale_frame, textvariable=self.var_n_frame, width=10, justify='right', vcmd=vcmd, validate='key')
         # self.label_n_frame_left.bind('<Return>', self.set_n_frame_2)
-        self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
-        self.label_n_frame_left.grid(row=0, column=0, padx=10, sticky='news')
+        # self.label_n_frame_left = ttk.Label(scale_frame, textvariable=self.var_n_frame)
+        self.label_n_frame_left = ttk.Label(scale_frame, text='%s/%s' % (self.n_frame, self.total_frame))
+        self.label_n_frame_left.grid(row=0, column=0, pady=5)
         self.scale_n_frame = ttk.Scale(scale_frame, from_=1, to_=self.total_frame, length=1250, command=self.set_n_frame)
         self.scale_n_frame.set(self.n_frame)
         self.scale_n_frame.state(['disabled'])
-        self.scale_n_frame.grid(row=0, column=1)
-        self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
-        self.label_n_frame_right.grid(row=0, column=2)
+        self.scale_n_frame.grid(row=1, column=0, padx=10)
+        # self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
+        # self.label_n_frame_right.grid(row=0, column=2)
 
     def create_info(self):
         text_video_name = '-----'
