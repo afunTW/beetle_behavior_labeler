@@ -102,7 +102,7 @@ class Interface(object):
             button_frame = ttk.LabelFrame(top, text='行為')
             button_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=10)
             for i, b in enumerate(bev):
-                butt = ttk.Button(button_frame, text=b, command=lambda behav=b: self.cleanup(behav=behav))
+                butt = ttk.Button(button_frame, text="%s (%s)" % (b, i+1), command=lambda behav=b: self.cleanup(behav=behav))
                 butt.grid(row=2, column=i, sticky='news', padx=5, pady=5)
                 top.bind('%s' % (i+1), lambda event, behav=b: self.cleanup(behav=behav))
 
