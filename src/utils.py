@@ -57,9 +57,13 @@ class Utils(object):
 
         if self.parent.state() == 'zoomed':
             shape = self.__frame__.shape
-            r1 = (shape[1] / self.parent.winfo_screenwidth())
-            r2 = (shape[0] / self.parent.winfo_screenheight())
-            shrink_r = max(r1, r2)
+            # r1 = (shape[1] / self.parent.winfo_screenwidth())
+            # r2 = (shape[0] / self.parent.winfo_screenheight())
+            # shrink_r = max(r1, r2)
+            self.parent.update()
+            r1 = (shape[1] / self.parent.winfo_width())
+            r2 = (shape[0] / self.parent.winfo_height())
+            shrink_r = r1
             self._c_width = self._r_width / shrink_r
             self._c_height = self._r_height / shrink_r
             nw = int(shape[1] * self._c_width)

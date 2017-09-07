@@ -34,7 +34,7 @@ class Interface(object):
                 self.__trajectory__ = json.load(f)
             self.scale_n_frame.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
-            self.label_n_frame_right['text'] = self.total_frame
+            # self.label_n_frame_right['text'] = self.total_frame
             # self.stop_ind = 1
             self.get_stop_ind()
 
