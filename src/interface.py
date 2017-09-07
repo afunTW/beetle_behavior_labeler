@@ -59,6 +59,7 @@ class Interface(object):
 
         def __init__(self, master, title, name, ind, tv):
             top=self.top= tk.Toplevel(master)
+            # top.resizable(False, False)
             self.tv = tv
             self.title = title
             bev = ['Attack', 'Wrestle', 'Chase', 'Escape']
@@ -68,10 +69,12 @@ class Interface(object):
             tk.Grid.columnconfigure(top, 0, weight=1)
             top.transient(master)
             top.grab_set()
-
-            tk.Label(top, text='幀數', font=("Georgia", 12)).grid(row=0, column=0, padx=10, pady=10)
-            tk.Label(top, text='名稱', font=("Georgia", 12)).grid(row=1, column=0, padx=10, pady=10)
-            tk.Label(top, text='行為', font=("Georgia", 12)).grid(row=2, column=0, padx=10, pady=10)
+            top.focus_force()
+            infoframe = ttk.Frame(top)
+            infoframe.grid(row=0, column=0, padx=10)
+            tk.Label(infoframe, text='幀數:', font=("Georgia", 12)).grid(row=0, column=0, padx=10, sticky='w')
+            tk.Label(infoframe, text='名稱:', font=("Georgia", 12)).grid(row=0, column=2, padx=10, sticky='w')
+            # tk.Label(top, text='行為:', font=("Georgia", 12)).grid(row=1, column=0, padx=10)
 
             f_ind = ind[0] if title == '新增' else self.tv.item(self.tv.selection()[0])['values'][0]
             if title == '新增' and ind[2] is not None:
@@ -84,36 +87,36 @@ class Interface(object):
             
             # self.f = ttk.Combobox(top, values=list(range(1, ind[1])))
             # self.f.current(f_ind - 1)
-            self.f = ttk.Entry(top)
             # e = tk.Entry(r,width=60)
+            self.f = ttk.Entry(infoframe, width=8)
             self.f.insert(0, ind[0])
             self.f.configure(state='readonly')
-            self.f.focus_force()
-            self.f.grid(row=0, column=1, padx=10, pady=10, sticky='news')
-            self.f.bind('<Return>', lambda event: self.cleanup())
-            self.n = ttk.Combobox(top, values=name)
+            self.f.grid(row=0, column=1, padx=10, sticky='w')
+            # self.f.bind('<Return>', lambda event: self.cleanup())
+            self.n = ttk.Combobox(infoframe, values=name, width=8)
             self.n.current(n_ind)
-            self.n.grid(row=1, column=1, padx=10, pady=10, sticky='news')
-            self.n.bind('<Return>', lambda event: self.cleanup())
-            self.b = ttk.Combobox(top, values=bev)
-            self.b.current(b_ind)
-            self.b.grid(row=2, column=1, padx=10, pady=10, sticky='news')
-            self.b.bind('<Return>', lambda event: self.cleanup())
-            
-            bt = ttk.Button(top,text='Ok',command=self.cleanup, width=5)
-            bt.grid(row=4, column=0, columnspan=2, sticky='news', padx=10, pady=10)
+            # self.n.configure(state='readonly')
+            self.n.grid(row=0, column=3, padx=10, sticky='w')
+            # self.n.bind('<Return>', lambda event: self.cleanup())
+
+            button_frame = ttk.LabelFrame(top, text='行為')
+            button_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=10)
+            for i, b in enumerate(bev):
+                butt = ttk.Button(button_frame, text=b, command=lambda behav=b: self.cleanup(behav=behav))
+                butt.grid(row=2, column=i, sticky='news', padx=5, pady=5)
+                top.bind('%s' % (i+1), lambda event, behav=b: self.cleanup(behav=behav))
 
             width = top.winfo_reqwidth() + 10
             height = top.winfo_reqheight() + 10
-            x = (top.winfo_screenwidth() // 2) - (width // 2)
+            x = (top.winfo_screenwidth() // 2.25) - (width // 2)
             y = (top.winfo_screenheight() // 2) - (height // 2)
             top.geometry('+%d+%d' % (x, y))
-            top.geometry('240x180')
+            # top.geometry('240x180')
 
             top.bind('<Escape>', lambda event: top.destroy())
 
-        def cleanup(self):
-            self.value = (self.f.get(), self.n.get(), self.b.get())
+        def cleanup(self, event=None, behav=None):
+            self.value = (self.f.get(), self.n.get(), behav)
             if self.title == '新增':
                 self.tv.insert('', 'end', len(self.tv.get_children()), values=self.value)
             elif self.title == '更改':

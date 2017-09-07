@@ -190,7 +190,7 @@ class KeyHandler(object):
                 print(e)
                 pass
         else:
-            self.msg('%s沒有埋葬蟲相鄰的 frame 了。' % "往前" if direct=='prev' else "往後")
+            self.msg('%s沒有埋葬蟲相鄰的 frame 了。' % ('往前' if direct=='prev' else '往後'))
 
     def on_select_all(self, event=None):
         if self.video_path is not None:
@@ -214,5 +214,3 @@ class KeyHandler(object):
                                      initialfile=filename, 
                                      title='存檔')
         df.to_csv(filename, index=False)
-
-

@@ -70,9 +70,12 @@ class Labeler(KeyHandler, Interface, Utils):
     def update_display(self):
         if self.video_path is not None:
             self.update_frame()
-        self.draw()
-        self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
-        self.disply_l.configure(image=self.__image__)
+        try:
+            self.draw()
+            self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
+            self.disply_l.configure(image=self.__image__)
+        except:
+            pass
 
         self.disply_l.after(20, self.update_display)
 
@@ -85,17 +88,20 @@ class Labeler(KeyHandler, Interface, Utils):
         # if int(float(self.var_n_frame.get())) != self.n_frame:
         # if str(self.label_n_frame_left.focus_get().__class__) != "<class 'tkinter.ttk.Entry'>":
         if self.video_path is not None:
-            self.var_n_frame.set(self.n_frame)
-            self.scale_n_frame.set(self.n_frame)
+            try:
+                self.var_n_frame.set(self.n_frame)
+                self.scale_n_frame.set(self.n_frame)
 
-            text_video_name = self.video_path.split('/')[-1]
-            sec = round(self.n_frame / self.fps, 2)
-            m, s = divmod(sec, 60)
-            h, m = divmod(m, 60)
-            text_time = "%d:%02d:%02d" % (h, m, s)
-            
-            self.label_video_name.configure(text=text_video_name)
-            self.label_time.configure(text=text_time)
+                text_video_name = self.video_path.split('/')[-1]
+                sec = round(self.n_frame / self.fps, 2)
+                m, s = divmod(sec, 60)
+                h, m = divmod(m, 60)
+                text_time = "%d:%02d:%02d" % (h, m, s)
+                
+                self.label_video_name.configure(text=text_video_name)
+                self.label_time.configure(text=text_time)
+            except:
+                pass
 
         self.parent.after(10, self.update_label)
 
