@@ -85,7 +85,7 @@ class KeyHandler(object):
         self.get_stop_ind(direct='prev')
 
     # logic to get stop frame index
-    def get_stop_ind(self, direct='next', n=None):
+    def get_stop_ind(self, direct='next', n=None, measure='distance'):
         pair = combinations(sorted(self.__trajectory__.keys()), 2)
         n = self.n_frame if n is None else n
         for k1, k2 in pair:
@@ -98,11 +98,15 @@ class KeyHandler(object):
                     ind_2 = min([v2['n_frame'].index(f) for f in v2['n_frame'] if f > n])
                     center_1 = v1['path'][ind_1:]
                     center_2 = v2['path'][ind_2:]
+                    wh_1 = v1['wh'][ind_1:]
+                    wh_2 = v2['wh'][ind_2:]
                 elif direct == 'prev':
                     ind_1 = max([v1['n_frame'].index(f) for f in v1['n_frame'] if f < n])
                     ind_2 = max([v2['n_frame'].index(f) for f in v2['n_frame'] if f < n])
                     center_1 = v1['path'][:(ind_1)]
                     center_2 = v2['path'][:(ind_2)]
+                    wh_1 = v1['wh'][:(ind_1)]
+                    wh_2 = v2['wh'][:(ind_2)]
                 # print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
             except:
                 ind_1, ind_2 = None, None
@@ -131,22 +135,27 @@ class KeyHandler(object):
                         elif f_1 == f_2:
                             c_1 = v1['path'][ind_1]
                             c_2 = v2['path'][ind_2]
-                            dist = np.linalg.norm(np.array(c_1) - np.array(c_2))
-                            # print(dist)
-                            if dist <= 50:
-                                brk = True
-                                self.stop_ind = f_1                       
-                                print('break from while loop')
-                                break
-                            else:
-                                if direct == 'next':
-                                    ind_1 += 1
-                                    ind_2 += 1
-                                elif direct == 'prev' and ind_1 != 0 and ind_2 != 0:
-                                    ind_1 -= 1
-                                    ind_2 -= 1
-                                elif ind_1 == 0 or ind_2 == 0:
+
+                            if measure == 'distance':
+                                dist = np.linalg.norm(np.array(c_1) - np.array(c_2))
+                                # print(dist)
+                                if dist <= 50:
+                                    brk = True
+                                    self.stop_ind = f_1                       
+                                    print('break from while loop')
                                     break
+                                else:
+                                    if direct == 'next':
+                                        ind_1 += 1
+                                        ind_2 += 1
+                                    elif direct == 'prev' and ind_1 != 0 and ind_2 != 0:
+                                        ind_1 -= 1
+                                        ind_2 -= 1
+                                    elif ind_1 == 0 or ind_2 == 0:
+                                        break
+                            elif measure == 'iou':
+                                pass
+                                
                     except Exception as e:
                         print(e)
                         break

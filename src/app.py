@@ -248,6 +248,7 @@ class Labeler(KeyHandler, Interface, Utils):
         self.op_frame = tk.Frame(self.display_frame)
         self.op_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
         self.op_frame.grid_rowconfigure(0, weight=1)
+        self.op_frame.grid_rowconfigure(1, weight=1)
         self.op_frame.grid_columnconfigure(0, weight=1)
         self.create_button()
 
