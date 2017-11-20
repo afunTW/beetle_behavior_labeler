@@ -9,7 +9,7 @@ from src.keyhandler import KeyHandler
 from src.interface import Interface
 from src.utils import Utils
 
-class Labeler(KeyHandler, Interface, Utils):
+class BehaviorLabeler(KeyHandler, Interface, Utils):
 
     def __init__(self, *args, **kwargs):
         # basic variables
