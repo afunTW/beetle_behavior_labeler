@@ -5,6 +5,7 @@ import numpy as np
 from tkinter.filedialog import asksaveasfilename
 from itertools import combinations
 from src.interface import Interface
+import tkinter as tk
 
 class KeyHandler(object):
 
@@ -24,6 +25,16 @@ class KeyHandler(object):
     def set_n_frame(self, s):
         v = int(float(s))
         self.n_frame = v
+        # update entry
+        current_id = self.init_f.focus_get()
+        if current_id is not None:
+            if current_id == self.init_f_focus_id:
+                self.init_f.delete(0, tk.END)
+                self.init_f.insert(0, self.n_frame)
+            else:
+                if self.n_frame > int(self.init_f.get()):
+                    self.end_f.delete(0, tk.END)
+                    self.end_f.insert(0, self.n_frame)
 
     def set_n_frame_2(self, event):
         self.n_frame = int(float(self.var_n_frame.get()))
