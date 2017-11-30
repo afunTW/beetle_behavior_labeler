@@ -17,6 +17,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.trajectory_path = None
         self.__video__ = None
         self.__trajectory__ = None
+        self.__obj_name__ = None
         self.__results_dict__ = dict()
         self.width = 1280
         self.height = 720

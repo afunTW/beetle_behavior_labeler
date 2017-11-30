@@ -33,6 +33,7 @@ class Utils(object):
                     xmin, xmax = int(x_c - w/2.0), int(x_c + w/2.0)
                     ymin, ymax = int(y_c - h/2.0), int(y_c + h/2.0)
 
+                    # 1 by 1 frame 的條件
                     if any([np.linalg.norm(np.array((x_c, y_c)) - np.array(v[1])) <= 50 for v in all_centers if v[0] != k]):
                         thickness = 2
                     else:
@@ -50,8 +51,8 @@ class Utils(object):
                     else:
                         x_t = xmin - 10
 
-                    cv2.putText(self.__frame__, k, (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, (255, 255, 255), 3)
-                    cv2.putText(self.__frame__, k, (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, c, 1)
+                    cv2.putText(self.__frame__, self.__obj_name__[k]['display_name'], (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, (255, 255, 255), 3)
+                    cv2.putText(self.__frame__, self.__obj_name__[k]['display_name'], (x_t, y_t), cv2.FONT_HERSHEY_TRIPLEX, 0.8, c, 1)
                 except Exception as e:
                     pass
 

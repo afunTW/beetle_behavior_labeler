@@ -31,7 +31,9 @@ class Interface(object):
         if ok:
             self.init_video()
             with open(self.trajectory_path, 'r') as f:
-                self.__trajectory__ = json.load(f)
+                tmp = json.load(f)
+                self.__trajectory__ = tmp['res']
+                self.__obj_name__ = tmp['name']
             self.scale_n_frame.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
             # self.label_n_frame_right['text'] = self.total_frame
