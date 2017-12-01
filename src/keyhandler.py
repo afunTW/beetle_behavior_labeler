@@ -25,16 +25,19 @@ class KeyHandler(object):
     def set_n_frame(self, s):
         v = int(float(s))
         self.n_frame = v
-        # update entry
-        current_id = self.init_f.focus_get()
-        if current_id is not None:
-            if current_id == self.init_f_focus_id:
-                self.init_f.delete(0, tk.END)
-                self.init_f.insert(0, self.n_frame)
-            else:
-                if self.n_frame > int(self.init_f.get()):
-                    self.end_f.delete(0, tk.END)
-                    self.end_f.insert(0, self.n_frame)
+        try:
+            # update entry
+            current_id = self.init_f.focus_get()
+            if current_id is not None:
+                if current_id == self.init_f_focus_id:
+                    self.init_f.delete(0, tk.END)
+                    self.init_f.insert(0, self.n_frame)
+                else:
+                    if self.n_frame >= int(self.init_f.get()):
+                        self.end_f.delete(0, tk.END)
+                        self.end_f.insert(0, self.n_frame)
+        except:
+            pass
 
     def set_n_frame_2(self, event):
         self.n_frame = int(float(self.var_n_frame.get()))
@@ -61,26 +64,32 @@ class KeyHandler(object):
 
     # add behavior record
     def on_add(self, event=None, sug_name=None):
-        if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
-            if sug_name is not None:
-                if self.k1 is not None:
-                    popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
-                    self.parent.wait_window(popup.top)
-                    # self.k1 = None
-                    if self.k2 is not None:
-                        popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-                        self.parent.wait_window(popup.top)
-                        # self.k2 = None
-                elif self.k2 is not None:
-                    popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-                    self.parent.wait_window(popup.top)
-                    if self.k1 is not None:
-                        popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
-                        self.parent.wait_window(popup.top)
+        print('on_add')
+        value = (self.init_f.get(), self.end_f.get(), self.obj_a.get(), self.actions.get(), self.obj_b.get())
+        self.tv.insert('', 'end', len(self.tv.get_children()), values=value)
 
-            else:
-                popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
-                self.parent.wait_window(popup.top)
+        
+
+        # if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
+        #     if sug_name is not None:
+        #         if self.k1 is not None:
+        #             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
+        #             self.parent.wait_window(popup.top)
+        #             # self.k1 = None
+        #             if self.k2 is not None:
+        #                 popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
+        #                 self.parent.wait_window(popup.top)
+        #                 # self.k2 = None
+        #         elif self.k2 is not None:
+        #             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
+        #             self.parent.wait_window(popup.top)
+        #             if self.k1 is not None:
+        #                 popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
+        #                 self.parent.wait_window(popup.top)
+
+        #     else:
+        #         popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
+        #         self.parent.wait_window(popup.top)
 
     # delete behavior record
     def on_delete(self, event=None):
@@ -185,7 +194,7 @@ class KeyHandler(object):
                     self.k1 = k1
                     self.k2 = k2
                     self.n_frame = self.stop_ind
-                    self.on_add(sug_name=k1)
+                    # self.on_add(sug_name=k1)
                 elif flag == 1:
                     ind = nframes.index(self.stop_ind)
                     try:
@@ -196,16 +205,19 @@ class KeyHandler(object):
                         self.k2 = k2
                         self.k1 = None
                         self.n_frame = self.stop_ind
-                        self.on_add(sug_name=k2)
+                        # self.on_add(sug_name=k2)
                     elif k2 == name:
                         self.k1 = k1
                         self.k2 = None
                         self.n_frame = self.stop_ind
-                        self.on_add(sug_name=k1)
-
+                        # self.on_add(sug_name=k1)
                 elif flag >= 2:
                     print('flag2', "\n"*10)
                     self.get_stop_ind(direct=direct, n=self.stop_ind)
+
+                # update new init frame
+                self.init_f.delete(0, tk.END)
+                self.init_f.insert(0, self.n_frame)
             except Exception as e:
                 print(e)
                 pass

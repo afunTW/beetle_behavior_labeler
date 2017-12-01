@@ -30,6 +30,8 @@ class Interface(object):
         ok = self.get_path()
         if ok:
             self.init_video()
+            if len(self.tv.get_children()) > 0:
+                self.tv.delete(*self.tv.get_children())
             with open(self.trajectory_path, 'r') as f:
                 tmp = json.load(f)
                 self.__trajectory__ = tmp['res']
