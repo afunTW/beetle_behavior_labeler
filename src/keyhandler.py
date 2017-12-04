@@ -25,6 +25,9 @@ class KeyHandler(object):
     def set_n_frame(self, s):
         v = int(float(s))
         self.n_frame = v
+        self.update_entry()
+
+    def update_entry(self):
         try:
             # update entry
             current_id = self.init_f.focus_get()
@@ -56,11 +59,12 @@ class KeyHandler(object):
             if self.n_frame == self.total_frame:
                 self.msg('Already the last frame!')
             else:
-                self.n_frame = min(self.total_frame, self.n_frame+10)
+                self.n_frame = min(self.total_frame, self.n_frame+n)
 
     # return to label frame index
     def on_return(self, event=None):
         self.n_frame = self.stop_ind
+        self.update_entry()
 
     # add behavior record
     def on_add(self, event=None, sug_name=None):
@@ -246,3 +250,16 @@ class KeyHandler(object):
                                      initialfile=filename, 
                                      title='存檔')
         df.to_csv(filename, index=False)
+
+    def jump_frame(self, event):
+        popup = Interface.popupEntry(self.parent, title="移動幀數", string="請輸入介於 %s ~ %s 的數字。" % (1, self.total_frame), validnum=True)
+        self.parent.wait_window(popup.top)
+        try:
+            n = int(popup.value)
+            if n >= 1 and n <= self.total_frame:
+                self.n_frame = n
+            else:
+                self.msg("請輸入介於 %s ~ %s 的數字。" % (1, self.total_frame))
+                self.jump_frame()
+        except Exception as e:
+            print(e)
