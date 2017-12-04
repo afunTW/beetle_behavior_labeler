@@ -342,7 +342,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Return>', self.on_return)
         self.parent.bind('<Down>', self.on_next)
         self.parent.bind('<Up>', self.on_prev)
-        self.parent.bind('<a>', self.on_add)
+        self.parent.bind('<space>', self.on_add)
         self.parent.bind('<Delete>', self.on_delete)
         self.tv.bind('<Control-a>', self.on_select_all)
         self.parent.bind('<d>', self.on_delete)
