@@ -148,9 +148,9 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         tk.Label(input_frame, text='起始幀數:', font=("Georgia", 14)).grid(row=0, column=0, padx=10, sticky='w')
         tk.Label(input_frame, text='結束幀數:', font=("Georgia", 14)).grid(row=0, column=2, padx=10, sticky='w')
-        tk.Label(input_frame, text='Object A:', font=("Georgia", 14)).grid(row=0, column=4, padx=10, sticky='w')
+        tk.Label(input_frame, text='Object 1:', font=("Georgia", 14)).grid(row=0, column=4, padx=10, sticky='w')
         tk.Label(input_frame, text='行為:', font=("Georgia", 14)).grid(row=0, column=6, padx=10, sticky='w')
-        tk.Label(input_frame, text='Object B:', font=("Georgia", 14)).grid(row=0, column=8, padx=10, sticky='w')
+        tk.Label(input_frame, text='Object 2:', font=("Georgia", 14)).grid(row=0, column=8, padx=10, sticky='w')
 
         self.init_f = ttk.Entry(input_frame, width=8)
         self.init_f.insert(0, 0)
@@ -282,17 +282,17 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.tv.column('sf', anchor='center', width=70)
         self.tv.heading('ef', text='end_f')
         self.tv.column('ef', anchor='center', width=70)
-        self.tv.heading('obja', text='obj_A')
+        self.tv.heading('obja', text='obj_1')
         self.tv.column('obja', anchor='center', width=80)
         self.tv.heading('bev', text='behav')
         self.tv.column('bev', anchor='center', width=80)
-        self.tv.heading('objb', text='obj_B')
+        self.tv.heading('objb', text='obj_2')
         self.tv.column('objb', anchor='center', width=80)
 
-        self.tv.grid(row=2, column=0, rowspan=2, sticky='news', pady=10)
+        self.tv.grid(row=1, column=0, rowspan=1, sticky='news', pady=10)
         
         vsb = ttk.Scrollbar(self.info_frame, orient="vertical", command=self.tv.yview)
-        vsb.grid(row=2, column=1, rowspan=2, sticky='news', pady=10)
+        vsb.grid(row=1, column=1, rowspan=1, sticky='news', pady=10)
         
         self.tv.configure(yscrollcommand=vsb.set)
         self.tv.bind('<Double-Button-1>', self.tvitem_click)
@@ -330,7 +330,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         # display info
         self.create_info()
-        self.create_potential_treeview()
+        # self.create_potential_treeview()
         # record operation frame
         self.create_res_treeview()
 
