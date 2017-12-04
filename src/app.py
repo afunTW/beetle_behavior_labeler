@@ -162,13 +162,13 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         # self.end_f.configure(state='readonly')
         self.end_f.grid(row=0, column=3, padx=10, sticky='w')
 
-        name = ["x", "A", "o", "="]
+        name = sorted(["x", "A", "o", "="])
         self.obj_a = ttk.Combobox(input_frame, values=name, width=5, state="readonly")
         self.obj_a.current(0)
         # self.n.configure(state='readonly')
         self.obj_a.grid(row=0, column=5, padx=10, sticky='w')
 
-        bev = ['Attack', 'Wrestle', 'Chase', 'Escape']
+        bev = ['Attack', 'Wrestle', 'Chase']
         self.actions = ttk.Combobox(input_frame, values=bev, width=5, state="readonly")
         self.actions.current(0)
         # self.n.configure(state='readonly')
@@ -342,9 +342,17 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.parent.bind('<Return>', self.on_return)
         self.parent.bind('<Down>', self.on_next)
         self.parent.bind('<Up>', self.on_prev)
-        self.tv.bind('<Control-a>', self.on_select_all)
         self.parent.bind('<a>', self.on_add)
+        self.parent.bind('<Delete>', self.on_delete)
+        self.tv.bind('<Control-a>', self.on_select_all)
         self.parent.bind('<d>', self.on_delete)
         self.parent.bind('<j>', self.jump_frame)
         self.init_f.bind('<FocusIn>', self.get_focus_entry)
         self.end_f.bind('<FocusIn>', self.get_focus_entry2)
+
+        # key bind for input
+        for k in ['q', 'w', 'e', 'r', 'a', 's', 'd', 'f']:
+            self.parent.bind(k.join('<>'), self.on_key)
+        for k in ['1', '2', '3']:
+            self.parent.bind(k, self.on_key)
+        

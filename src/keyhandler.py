@@ -70,8 +70,9 @@ class KeyHandler(object):
     # add behavior record
     def on_add(self, event=None, sug_name=None):
         print('on_add')
-        value = (self.init_f.get(), self.end_f.get(), self.obj_a.get(), self.actions.get(), self.obj_b.get())
-        self.tv.insert('', 'end', len(self.tv.get_children()), values=value)
+        if self.init_f.get() != self.end_f.get():
+            value = (self.init_f.get(), self.end_f.get(), self.obj_a.get(), self.actions.get(), self.obj_b.get())
+            self.tv.insert('', 'end', len(self.tv.get_children()), values=value)
 
         # if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
         #     if sug_name is not None:
@@ -266,3 +267,29 @@ class KeyHandler(object):
                 self.jump_frame()
         except Exception as e:
             print(e)
+
+    def on_key(self, event):
+        # print('Detect on key')
+        sym = event.keysym
+        if sym == '1':
+            self.actions.current(0)
+        elif sym == '2':
+            self.actions.current(1)
+        elif sym == '3':
+            self.actions.current(2)
+        elif sym == 'q':
+            self.obj_a.current(0)
+        elif sym == 'w':
+            self.obj_a.current(1)
+        elif sym == 'e':
+            self.obj_a.current(2)
+        elif sym == 'r':
+            self.obj_a.current(3)
+        elif sym == 'a':
+            self.obj_b.current(0)
+        elif sym == 's':
+            self.obj_b.current(1)
+        elif sym == 'd':
+            self.obj_b.current(2)
+        elif sym == 'f':
+            self.obj_b.current(3)
