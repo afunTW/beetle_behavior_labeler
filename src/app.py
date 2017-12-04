@@ -335,8 +335,10 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.create_res_treeview()
 
         self.parent.bind('<Escape>', self.on_close)
-        self.parent.bind('<Left>', self.on_left)
-        self.parent.bind('<Right>', self.on_right)
+        self.parent.bind('<Left>', lambda event: self.on_left(event))
+        self.parent.bind('<Right>', lambda event: self.on_right(event))
+        self.parent.bind('<Shift-Left>', lambda event: self.on_left(event, n=1))
+        self.parent.bind('<Shift-Right>', lambda event: self.on_right(event, n=1))
         self.parent.bind('<Return>', self.on_return)
         self.parent.bind('<Down>', self.on_next)
         self.parent.bind('<Up>', self.on_prev)

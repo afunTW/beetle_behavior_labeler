@@ -43,20 +43,20 @@ class KeyHandler(object):
         self.n_frame = int(float(self.var_n_frame.get()))
 
     # move to previous frame
-    def on_left(self, event=None):
+    def on_left(self, event=None, n=10):
         if self.video_path is not None:
             if self.n_frame > 1:
-                self.n_frame -= 1
+                self.n_frame = max(1, self.n_frame-n)
             else:
                 self.msg('Already the first frame!')
     
     # move to next frame
-    def on_right(self, event=None):
+    def on_right(self, event=None, n=10):
         if self.video_path is not None:
             if self.n_frame == self.total_frame:
                 self.msg('Already the last frame!')
             else:
-                self.n_frame += 1
+                self.n_frame = min(self.total_frame, self.n_frame+10)
 
     # return to label frame index
     def on_return(self, event=None):
