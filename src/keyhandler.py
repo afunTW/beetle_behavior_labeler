@@ -13,14 +13,15 @@ class KeyHandler(object):
         if self.video_path is not None:
             sel_items = self.tv.selection() if item is None else item
             if sel_items:
-                popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame, None), tv=self.tv)
-                self.parent.wait_window(popup.top)
-                sel_item = sel_items[0]
-                try:
-                    self.tv.item(sel_item, values=popup.value)
-                    # print(popup.value)
-                except:
-                    pass
+                self.n_frame = self.tv.item(self.tv.selection()[0])['values'][0]
+                # popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame, None), tv=self.tv)
+                # self.parent.wait_window(popup.top)
+                # sel_item = sel_items[0]
+                # try:
+                #     self.tv.item(sel_item, values=popup.value)
+                #     # print(popup.value)
+                # except:
+                #     pass
 
     def set_n_frame(self, s):
         v = int(float(s))
@@ -71,8 +72,6 @@ class KeyHandler(object):
         print('on_add')
         value = (self.init_f.get(), self.end_f.get(), self.obj_a.get(), self.actions.get(), self.obj_b.get())
         self.tv.insert('', 'end', len(self.tv.get_children()), values=value)
-
-        
 
         # if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
         #     if sug_name is not None:
@@ -234,14 +233,16 @@ class KeyHandler(object):
                 self.tv.selection_add(x)
 
     def on_save(self, event=None):
-        {'frame_index': [], 'name': [], 'behavior': []}
+        self.__results_dict__ = {'start_frame': [], 'end_frame': [], 'object_1': [], 'object_2': [], 'behav': []}
         values = [self.tv.item(child)['values'] for child in self.tv.get_children()]
-        self.__results_dict__['frame_index'] = list(map(lambda x: x[0], values))
-        self.__results_dict__['name'] = list(map(lambda x: x[1], values))
-        self.__results_dict__['behavior'] = list(map(lambda x: x[2], values))
+        self.__results_dict__['start_frame'] = list(map(lambda x: x[0], values))
+        self.__results_dict__['end_frame'] = list(map(lambda x: x[1], values))
+        self.__results_dict__['object_1'] = list(map(lambda x: x[2], values))
+        self.__results_dict__['behav'] = list(map(lambda x: x[3], values))
+        self.__results_dict__['object_2'] = list(map(lambda x: x[4], values))
 
         df = pd.DataFrame(self.__results_dict__)
-        df = df.reindex_axis(['frame_index', 'name', 'behavior'], axis=1)
+        df = df.reindex_axis(['start_frame', 'end_frame', 'object_1', 'behav', 'object_2'], axis=1)
         root = '/'.join(self.video_path.split('/')[:-1])
         filename = self.video_path.split('/')[-1].split('.avi')[0] + '_behavior_record'
         filename = asksaveasfilename(initialdir='%s' % (root), 
@@ -250,6 +251,8 @@ class KeyHandler(object):
                                      initialfile=filename, 
                                      title='存檔')
         df.to_csv(filename, index=False)
+
+        self.msg("行為標註已存檔於 %s" % filename)
 
     def jump_frame(self, event):
         popup = Interface.popupEntry(self.parent, title="移動幀數", string="請輸入介於 %s ~ %s 的數字。" % (1, self.total_frame), validnum=True)

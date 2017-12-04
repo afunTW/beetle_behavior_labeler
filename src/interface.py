@@ -5,6 +5,7 @@ from tkinter.filedialog import askopenfilename
 import os
 import cv2
 import json
+import pandas as pd
 
 class Interface(object):
 
@@ -24,6 +25,10 @@ class Interface(object):
     # confirm quiting
     def on_close(self, event=None):
         if askokcancel('離開', '你確定要關閉程式嗎？'):
+            # try:
+            #     self.on_save()
+            # except:
+            #     pass
             self.parent.destroy()
 
     def on_load(self):
@@ -38,6 +43,16 @@ class Interface(object):
                 self.__obj_name__ = tmp['name']
             self.scale_n_frame.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
+            
+            root = '/'.join(self.video_path.split('/')[:-1])
+            filename = self.video_path.split('/')[-1].split('.avi')[0] + '_behavior_record.csv'
+            if os.path.isfile(os.path.join(root, filename)):
+                print('Loading previous records...')
+                tmp_res = pd.read_csv(os.path.join(root, filename))
+                for i, r in tmp_res.iterrows():
+                    value = (r.start_frame, r.end_frame, r.object_1, r.behav, r.object_2)
+                    self.tv.insert('', 'end', 0, values=value)
+                self.n_frame = r.end_frame
             # self.label_n_frame_right['text'] = self.total_frame
             # self.stop_ind = 1
             self.get_stop_ind()
