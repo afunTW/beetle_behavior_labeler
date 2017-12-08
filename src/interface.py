@@ -53,9 +53,9 @@ class Interface(object):
                     value = (r.start_frame, r.end_frame, r.object_1, r.behav, r.object_2)
                     self.tv.insert('', 'end', 0, values=value)
                 self.n_frame = r.end_frame
-            # self.label_n_frame_right['text'] = self.total_frame
+            self.calc_dist()
             # self.stop_ind = 1
-            self.get_stop_ind()
+            # self.get_stop_ind()
 
     def get_path(self):
         path = askopenfilename(title='請選擇影像路徑', filetypes=[('video file (*.avi;)', '*.avi;')])
