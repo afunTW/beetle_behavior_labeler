@@ -14,7 +14,7 @@ from src.keyhandler import KeyHandler
 from src.interface import Interface
 from src.utils import Utils
 
-N_MAX_PLOT = 800000
+N_MAX_PLOT = 80000
 
 class BehaviorLabeler(KeyHandler, Interface, Utils):
 
@@ -45,6 +45,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.k1 = None
         self.k2 = None
         self.lines = [] # for matplotlib distance plot
+        self.vlines = []
 
         self.init_f_focus_id = None
         self.end_f_focus_id = None
@@ -119,25 +120,28 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
             if len(self.lines) != 0:
                 for i in range(self.dist_df.shape[1]):
-                    x = self.dist_df.index[self.n_frame:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
-                    y = self.dist_df.iloc[self.n_frame:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
+                    x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
+                    y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
                     self.lines[i].set_data(x, y)
+                    self.vlines[i].set_xdata(self.n_frame)
                     ax = self.canvas.figure.axes[i]
                     ax.set_xlim(x.min(), x.max())
-                    ax.set_ylim(0, y.max())
-                ax.set_xlabel("frame index", fontsize='large')
+                    ax.set_ylim(0, y.max())                    
+                # ax.set_xlabel("frame index", fontsize='large')
             elif len(self.lines) == 0:
                 
                 for i in range(1, self.dist_df.shape[1]+1):
                     ax = self.fig.add_subplot(7, 1, i)
-                    x = self.dist_df.index[self.n_frame:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
-                    y = self.dist_df.iloc[self.n_frame:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
+                    x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
+                    y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
                     X, = ax.plot(x, y, color='#008000', label=self.dist_df.columns[i-1], lw=1.5)
+                    vX = ax.axvline(x=self.n_frame, linestyle="--", lw='2', color='r')
                     ax.legend(loc="upper right", fontsize='small')
                     if i < self.dist_df.shape[1]:
                         plt.setp(ax.get_xticklabels(), visible=False)
                     self.lines.append(X)
-                self.fig.text(0.04, 0.55, 'Distance', ha='center', fontsize='large')
+                    self.vlines.append(vX)
+                # self.fig.text(0.04, 0.55, 'Distance', ha='center', fontsize='large')
             self.canvas.draw()
         self.parent.after(100, self.update_distance)
 
@@ -372,7 +376,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.create_menu()
 
         # display label
-        self.__frame__ = np.zeros((720, 1280, 3), dtype='uint8')
+        self.__frame__ = np.zeros((int(720/2), int(1280/2), 3), dtype='uint8')
         cv2.putText(self.__frame__, 'Load Video', (300, 360), 7, 5, (255, 255, 255), 2)
         self.__orig_frame__ = self.__frame__.copy()
         self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
@@ -380,12 +384,12 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         self.display_frame = tk.Frame(self.parent)
         self.display_frame.grid(row=0, column=0, padx=10, pady=10)
-        self.display_frame.grid_rowconfigure(0, weight=1)
+        # self.display_frame.grid_rowconfigure(0, weight=1)
         self.display_frame.grid_rowconfigure(1, weight=1)
         self.display_frame.grid_columnconfigure(0, weight=1)
         self.display_frame.grid_rowconfigure(2, weight=1)
         
-        self.fig = Figure(figsize=(10, 12))
+        self.fig = Figure(figsize=(2, 5))
         
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.display_frame)
         self.canvas.show()
@@ -393,7 +397,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky='news')
 
         self.disply_l = ttk.Label(self.display_frame, image=self.__image__)
-        self.disply_l.grid(row=1, column=0, sticky='news', padx=10, pady=10)
+        self.disply_l.grid(row=1, column=0, padx=10, pady=10)
 
         # frame operation frame
         self.op_frame = tk.Frame(self.display_frame)
