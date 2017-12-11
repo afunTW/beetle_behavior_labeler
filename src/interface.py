@@ -53,6 +53,7 @@ class Interface(object):
                     value = (r.start_frame, r.end_frame, r.object_1, r.behav, r.object_2)
                     self.tv.insert('', 'end', 0, values=value)
                 self.n_frame = r.end_frame
+
             self.calc_dist()
             # self.stop_ind = 1
             # self.get_stop_ind()

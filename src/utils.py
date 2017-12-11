@@ -35,9 +35,9 @@ class Utils(object):
 
                     # 1 by 1 frame 的條件
                     if any([np.linalg.norm(np.array((x_c, y_c)) - np.array(v[1])) <= 50 for v in all_centers if v[0] != k]):
-                        thickness = 2
+                        thickness = 3
                     else:
-                        thickness = 1
+                        thickness = 2
 
                     cv2.rectangle(self.__frame__, (xmin, ymin), (xmax, ymax), c, thickness)
 
@@ -62,8 +62,8 @@ class Utils(object):
             # r2 = (shape[0] / self.parent.winfo_screenheight())
             # shrink_r = max(r1, r2)
             self.parent.update()
-            r1 = (shape[1] / (self.parent.winfo_width()/1.3))
-            r2 = (shape[0] / (self.parent.winfo_height()/1.3))
+            r1 = (shape[1] / (self.parent.winfo_width()/1.05))
+            r2 = (shape[0] / (self.parent.winfo_height()/1.05))
             shrink_r = r1
             self._c_width = self._r_width / shrink_r
             self._c_height = self._r_height / shrink_r

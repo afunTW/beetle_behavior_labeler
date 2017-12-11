@@ -4,4 +4,4 @@ import tkinter as tk
 from src.app import BehaviorLabeler
 
 if __name__ == '__main__':
-	BehaviorLabeler()
+    BehaviorLabeler()

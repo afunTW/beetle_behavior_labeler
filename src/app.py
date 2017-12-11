@@ -6,6 +6,11 @@ import numpy as np
 import pandas as pd
 from itertools import combinations
 from PIL import Image, ImageTk
+import matplotlib.style
+# matplotlib.use("TkAgg")
+# matplotlib.style.use('fivethirtyeight')
+matplotlib.style.use('classic')
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
@@ -14,7 +19,7 @@ from src.keyhandler import KeyHandler
 from src.interface import Interface
 from src.utils import Utils
 
-N_MAX_PLOT = 80000
+N_MAX_PLOT = 50000
 
 class BehaviorLabeler(KeyHandler, Interface, Utils):
 
@@ -35,6 +40,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         self.stop_ind = 1
         self.n_frame = 1
+        self.__drew_n_frame__ = None
         self.__frame__ = None
         self.__orig_frame__ = None
         self.__image__ = None
@@ -115,43 +121,78 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
     def update_distance(self):
 
         if self.dist_df is not None:
-            # self.start_f = 0
-            # self.end_f = min(500, max(self.dist_df.index))
+            if self.__drew_n_frame__ is None or self.__drew_n_frame__ != self.n_frame:
+                # self.start_f = 0
+                # self.end_f = min(500, max(self.dist_df.index))
 
-            if len(self.lines) != 0:
-                for i in range(self.dist_df.shape[1]):
-                    x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
-                    y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
-                    self.lines[i].set_data(x, y)
-                    self.vlines[i].set_xdata(self.n_frame)
-                    ax = self.canvas.figure.axes[i]
-                    ax.set_xlim(x.min(), x.max())
-                    ax.set_ylim(0, y.max())                    
-                # ax.set_xlabel("frame index", fontsize='large')
-            elif len(self.lines) == 0:
-                
-                for i in range(1, self.dist_df.shape[1]+1):
-                    ax = self.fig.add_subplot(7, 1, i)
-                    x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
-                    y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
-                    X, = ax.plot(x, y, color='#008000', label=self.dist_df.columns[i-1], lw=1.5)
-                    vX = ax.axvline(x=self.n_frame, linestyle="--", lw='2', color='r')
-                    ax.legend(loc="upper right", fontsize='small')
-                    if i < self.dist_df.shape[1]:
-                        plt.setp(ax.get_xticklabels(), visible=False)
-                    self.lines.append(X)
-                    self.vlines.append(vX)
-                # self.fig.text(0.04, 0.55, 'Distance', ha='center', fontsize='large')
-            self.canvas.draw()
-        self.parent.after(100, self.update_distance)
+                if len(self.lines) != 0:
+                    for i in range(self.dist_df.shape[1]):
+                        x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
+                        y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i]
+                        self.lines[i].set_data(x, y)
+                        self.vlines[i].set_xdata(self.n_frame)
+                        
+                        try:
+                            ax = self.canvas.figure.axes[i]
+                        except:
+                            ax = self.canvas.figure.axes[0]
+                        
+                        ax.set_xlim(x.min(), x.max())
+                        ax.set_yscale('log')
+                        ax.set_yticklabels([])
+                        try:
+                            ax.set_ylim(0, 1480)
+                        except:
+                            ax.set_ylim(0, 50)
+                        
+
+                    # ax.set_xlabel("frame index", fontsize='large')
+                elif len(self.lines) == 0:
+                    
+                    for i in range(1, self.dist_df.shape[1]+1):
+                        x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
+                        y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
+                        
+                        ax = self.fig.add_subplot(7, 1, i)
+                        X, = ax.plot(x, y, color='#008000', label=self.dist_df.columns[i-1], lw=1.5)
+                        ax.set_xlim(x.min(), x.max())
+                        ax.set_yscale('log')
+                        ax.set_yticklabels([])
+                        try:
+                            ax.set_ylim(0, 1480)
+                        except Exception as e:
+                            if self.dist_df.columns[i-1] == "A - x":
+                                print(e)
+                            ax.set_ylim(0, 0)
+                        # ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
+                        
+                        # ax = self.fig.add_subplot(1, 1, 1)
+                        # X, = ax.plot(x, y, label=self.dist_df.columns[i-1])
+                        
+                        vX = ax.axvline(x=self.n_frame, linestyle="--", lw='2', color='r')
+                        hY = ax.axhline(y=30, linestyle="--", lw='1.25', color='black')
+                        # ax.legend(loc="upper center", fontsize='small')
+                        ax.legend(loc="upper right", bbox_to_anchor=(1.05,1), fontsize='x-small')
+                        if i < self.dist_df.shape[1]:
+                            plt.setp(ax.get_xticklabels(), visible=False)
+                        self.lines.append(X)
+                        self.vlines.append(vX)
+
+                    # self.fig.text(0.04, 0.55, 'Distance', ha='center', fontsize='large')
+                # self.fig.tight_layout()
+                self.canvas.draw()
+                self.__drew_n_frame__ = self.n_frame
+        self.parent.after(10, self.update_distance)
 
     def update_display(self):
         if self.video_path is not None:
             self.update_frame()
         try:
+            # if self.__drew_n_frame__ is None or self.__drew_n_frame__ != self.n_frame:
             self.draw()
             self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
             self.disply_l.configure(image=self.__image__)
+                # self.__drew_n_frame__ = self.n_frame
         except:
             pass
 
@@ -199,6 +240,8 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.fps = int(self.__video__.get(5))
         self.resolution = (self.width, self.height)
         self.total_frame = int(self.__video__.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.__drew_n_frame = None
+        # self.lines, self.vlines = [], []
 
     def create_menu(self):
 
@@ -389,19 +432,21 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.display_frame.grid_columnconfigure(0, weight=1)
         self.display_frame.grid_rowconfigure(2, weight=1)
         
-        self.fig = Figure(figsize=(2, 5))
-        
+        figsize=(1, 4)
+        self.fig = Figure(figsize=figsize)
+        self.fig.subplots_adjust(left=0.01,right=0.95,bottom=0,top=0.98)
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.display_frame)
         self.canvas.show()
 
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='news')
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nesw')
 
         self.disply_l = ttk.Label(self.display_frame, image=self.__image__)
-        self.disply_l.grid(row=1, column=0, padx=10, pady=10)
+        self.disply_l.grid(row=2, column=0, padx=10, pady=10)
 
         # frame operation frame
         self.op_frame = tk.Frame(self.display_frame)
-        self.op_frame.grid(row=2, column=0, sticky='news', padx=10, pady=10)
+        self.op_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
         self.op_frame.grid_rowconfigure(0, weight=1)
         self.op_frame.grid_rowconfigure(1, weight=1)
         self.op_frame.grid_columnconfigure(0, weight=1)
