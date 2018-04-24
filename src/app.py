@@ -65,8 +65,9 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         # UI
         self.parent = tk.Tk()
+        if os.name == 'nt':
+            self.parent.iconbitmap('icons/title.ico')
         self.parent.title('Burying Beetle Behavior Labeler')
-        self.parent.iconbitmap('icons/title.ico')
         self.parent.protocol('WM_DELETE_WINDOW', self.on_close)
         self.parent.option_add('*tearOff', False)
         tk.Grid.rowconfigure(self.parent, 0 , weight=1)
@@ -91,7 +92,10 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self._r_width = self.__frame__.shape[1] / self.parent.winfo_reqwidth()
 
         # maximize the window
-        self.parent.state('zoomed')
+        if os.name == 'nt':
+            self.parent.state('zoomed')
+        else:
+            self.parent.attributes('-zoomed', True)
 
         self.parent.mainloop()
 
@@ -199,7 +203,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
             self.draw()
             self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
             self.disply_l.configure(image=self.__image__)
-                # self.__drew_n_frame__ = self.n_frame
+            # self.__drew_n_frame__ = self.n_frame
         except:
             pass
 

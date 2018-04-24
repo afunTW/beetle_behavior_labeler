@@ -30,10 +30,6 @@ class Interface(object):
     # confirm quiting
     def on_close(self, event=None):
         if askokcancel('離開', '你確定要關閉程式嗎？'):
-            # try:
-            #     self.on_save()
-            # except:
-            #     pass
             self.parent.destroy()
 
     def on_load(self):
@@ -60,11 +56,12 @@ class Interface(object):
                 self.n_frame = r.end_frame
 
             self.calc_dist()
-            # self.stop_ind = 1
-            # self.get_stop_ind()
 
     def get_path(self):
-        path = askopenfilename(title='請選擇影像路徑', filetypes=[('video file (*.avi;)', '*.avi;')])
+        if os.name == 'nt':
+            path = askopenfilename(title='請選擇影像路徑', filetypes=[('video file (*.avi;)', '*.avi;')])
+        else:
+            path = askopenfilename(title='請選擇影像路徑')
 
         if path in [None, ""]:
             self.msg('請載入影像檔案。')
