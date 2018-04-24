@@ -8,6 +8,13 @@ from scipy.linalg import _fblas
 from src.app import BehaviorLabeler
 
 LOGGER = logging.getLogger(__name__)
+LOGGERS = [
+    LOGGER,
+    logging.getLogger('src.app'),
+    logging.getLogger('src.interface'),
+    logging.getLogger('src.keyhandler'),
+    logging.getLogger('src.utils')
+]
 
 
 def log_handler(*loggers):
@@ -26,5 +33,5 @@ def log_handler(*loggers):
 
 
 if __name__ == '__main__':
-    log_handler(LOGGER)
+    log_handler(*LOGGERS)
     BehaviorLabeler()
