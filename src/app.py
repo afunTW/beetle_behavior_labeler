@@ -70,10 +70,8 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.parent.title('Burying Beetle Behavior Labeler')
         self.parent.protocol('WM_DELETE_WINDOW', self.on_close)
         self.parent.option_add('*tearOff', False)
-        tk.Grid.rowconfigure(self.parent, 0 , weight=1)
-        tk.Grid.columnconfigure(self.parent, 0 , weight=1)
-        tk.Grid.rowconfigure(self.parent, 1 , weight=1)
-        tk.Grid.columnconfigure(self.parent, 1 , weight=1)
+        self.set_all_grid_rowconfigure(self.parent, 0, 1)
+        self.set_all_grid_columnconfigure(self.parent, 0, 1)
 
         style = ttk.Style()
         style.configure("Treeview.Heading", font=('Georgia', 14))
@@ -98,6 +96,16 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
             self.parent.attributes('-zoomed', True)
 
         self.parent.mainloop()
+
+    # set grid all column configure
+    def set_all_grid_columnconfigure(self, widget, *cols):
+        for col in cols:
+            widget.grid_columnconfigure(col, weight=1)
+
+    # set grid all row comfigure
+    def set_all_grid_rowconfigure(self, widget, *rows):
+        for row in rows:
+            widget.grid_rowconfigure(row, weight=1)
 
     def calc_dist(self):
         obj_name = self.__obj_name__
