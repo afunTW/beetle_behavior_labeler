@@ -1,11 +1,15 @@
-# import tkinter as tk
-# from tkinter import ttk
-import pandas as pd
-import numpy as np
-from tkinter.filedialog import asksaveasfilename
-from itertools import combinations
-from src.interface import Interface
+import logging
 import tkinter as tk
+from itertools import combinations
+from tkinter.filedialog import asksaveasfilename
+
+import numpy as np
+import pandas as pd
+
+from src.interface import Interface
+
+LOGGER = logging.getLogger(__name__)
+
 
 class KeyHandler(object):
 
@@ -14,14 +18,6 @@ class KeyHandler(object):
             sel_items = self.tv.selection() if item is None else item
             if sel_items:
                 self.n_frame = self.tv.item(self.tv.selection()[0])['values'][0]
-                # popup = Interface.popupEdit(self.parent, title="更改", name=sorted(self.__trajectory__.keys()), ind=(self.stop_ind, self.total_frame, None), tv=self.tv)
-                # self.parent.wait_window(popup.top)
-                # sel_item = sel_items[0]
-                # try:
-                #     self.tv.item(sel_item, values=popup.value)
-                #     # print(popup.value)
-                # except:
-                #     pass
 
     def set_n_frame(self, s):
         v = int(float(s))
@@ -53,7 +49,7 @@ class KeyHandler(object):
                 self.n_frame = max(1, self.n_frame-n)
             else:
                 self.msg('Already the first frame!')
-    
+
     # move to next frame
     def on_right(self, event=None, n=10):
         if self.video_path is not None:
@@ -69,31 +65,9 @@ class KeyHandler(object):
 
     # add behavior record
     def on_add(self, event=None, sug_name=None):
-        print('on_add')
         if self.init_f.get() != self.end_f.get():
             value = (self.init_f.get(), self.end_f.get(), self.obj_a.get(), self.actions.get(), self.obj_b.get())
             self.tv.insert('', 'end', len(self.tv.get_children()), values=value)
-
-        # if self.video_path is not None and (len(self.tv.selection()) != len(self.tv.get_children()) or len(self.tv.get_children()) == 0):
-        #     if sug_name is not None:
-        #         if self.k1 is not None:
-        #             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
-        #             self.parent.wait_window(popup.top)
-        #             # self.k1 = None
-        #             if self.k2 is not None:
-        #                 popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-        #                 self.parent.wait_window(popup.top)
-        #                 # self.k2 = None
-        #         elif self.k2 is not None:
-        #             popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k2), tv=self.tv)
-        #             self.parent.wait_window(popup.top)
-        #             if self.k1 is not None:
-        #                 popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, self.k1), tv=self.tv)
-        #                 self.parent.wait_window(popup.top)
-
-        #     else:
-        #         popup = Interface.popupEdit(self.parent, title="新增", name=sorted(self.__trajectory__.keys()), ind=(self.n_frame, self.total_frame, None), tv=self.tv)
-        #         self.parent.wait_window(popup.top)
 
     # delete behavior record
     def on_delete(self, event=None):
@@ -103,7 +77,7 @@ class KeyHandler(object):
     # move to next stop frame index
     def on_next(self, event=None):
         self.get_stop_ind(direct='next')
-    
+
     # move to previous stop frame index
     def on_prev(self, event=None):
         self.get_stop_ind(direct='prev')
@@ -131,7 +105,6 @@ class KeyHandler(object):
                     center_2 = v2['path'][:(ind_2)]
                     wh_1 = v1['wh'][:(ind_1)]
                     wh_2 = v2['wh'][:(ind_2)]
-                # print('Index: ', ind_1, ind_2, len(v1['n_frame']), len(v2['n_frame']))
             except:
                 ind_1, ind_2 = None, None
 
@@ -143,7 +116,6 @@ class KeyHandler(object):
                     try:
                         f_1 = v1['n_frame'][ind_1]
                         f_2 = v2['n_frame'][ind_2]
-                        # print('Nframe: ', f_1, f_2)
                         if f_1 > f_2:
                             if direct == 'next':
                                 ind_2 += 1
@@ -162,11 +134,10 @@ class KeyHandler(object):
 
                             if measure == 'distance':
                                 dist = np.linalg.norm(np.array(c_1) - np.array(c_2))
-                                # print(dist)
                                 if dist <= 50:
                                     brk = True
-                                    self.stop_ind = f_1                       
-                                    print('break from while loop')
+                                    self.stop_ind = f_1
+                                    LOGGER.info('break from while loop')
                                     break
                                 else:
                                     if direct == 'next':
@@ -179,17 +150,15 @@ class KeyHandler(object):
                                         break
                             elif measure == 'iou':
                                 pass
-                                
+
                     except Exception as e:
-                        print(e)
+                        LOGGER.exception(e)
                         break
                 if brk:
-                    print('break from for loop')
+                    LOGGER.info('break from for loop')
                     break
 
         if brk:
-            # print('come', '\n'*10)
-
             values = [self.tv.item(child)['values'] for child in self.tv.get_children()]
             try:
                 nframes = list(map(lambda x: x[0], values))
@@ -204,7 +173,7 @@ class KeyHandler(object):
                     try:
                         name = list(map(lambda x: x[1], values))[ind]
                     except Exception as e:
-                        print(e)
+                        LOGGER.exception(e)
                     if k1 == name:
                         self.k2 = k2
                         self.k1 = None
@@ -216,14 +185,14 @@ class KeyHandler(object):
                         self.n_frame = self.stop_ind
                         # self.on_add(sug_name=k1)
                 elif flag >= 2:
-                    print('flag2', "\n"*10)
+                    LOGGER.info('flag2')
                     self.get_stop_ind(direct=direct, n=self.stop_ind)
 
                 # update new init frame
                 self.init_f.delete(0, tk.END)
                 self.init_f.insert(0, self.n_frame)
             except Exception as e:
-                print(e)
+                LOGGER.exception(e)
                 pass
         else:
             self.msg('%s沒有埋葬蟲相鄰的 frame 了。' % ('往前' if direct=='prev' else '往後'))
@@ -246,10 +215,10 @@ class KeyHandler(object):
         df = df.reindex_axis(['start_frame', 'end_frame', 'object_1', 'behav', 'object_2'], axis=1)
         root = '/'.join(self.video_path.split('/')[:-1])
         filename = self.video_path.split('/')[-1].split('.avi')[0] + '_behavior_record'
-        filename = asksaveasfilename(initialdir='%s' % (root), 
-                                     defaultextension=".csv", 
-                                     filetypes=(("CSV (逗號分隔)", "*.csv"),("All Files", "*.*")), 
-                                     initialfile=filename, 
+        filename = asksaveasfilename(initialdir='%s' % (root),
+                                     defaultextension=".csv",
+                                     filetypes=(("CSV (逗號分隔)", "*.csv"),("All Files", "*.*")),
+                                     initialfile=filename,
                                      title='存檔')
         df.to_csv(filename, index=False)
 
@@ -266,10 +235,9 @@ class KeyHandler(object):
                 self.msg("請輸入介於 %s ~ %s 的數字。" % (1, self.total_frame))
                 self.jump_frame()
         except Exception as e:
-            print(e)
+            LOGGER.exception(e)
 
     def on_key(self, event):
-        # print('Detect on key')
         sym = event.keysym
         if sym == '1':
             self.actions.current(0)

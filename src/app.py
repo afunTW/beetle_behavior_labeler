@@ -1,24 +1,31 @@
+import copy
+import json
+import logging
+import os
+import time
 import tkinter as tk
+from itertools import combinations
 from tkinter import ttk
+
 import cv2
-import time, os, json, copy
+import matplotlib.pyplot as plt
+import matplotlib.style
 import numpy as np
 import pandas as pd
-from itertools import combinations
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 from PIL import Image, ImageTk
-import matplotlib.style
+
+from src.interface import Interface
+from src.keyhandler import KeyHandler
+from src.utils import Utils
+
 # matplotlib.use("TkAgg")
 # matplotlib.style.use('fivethirtyeight')
 matplotlib.style.use('classic')
 
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
 
-from src.keyhandler import KeyHandler
-from src.interface import Interface
-from src.utils import Utils
-
+LOGGER = logging.getLogger(__name__)
 N_MAX_PLOT = 50000
 
 class BehaviorLabeler(KeyHandler, Interface, Utils):
@@ -82,7 +89,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.parent.update_idletasks()
         self._r_height = self.__frame__.shape[0] / self.parent.winfo_reqheight()
         self._r_width = self.__frame__.shape[1] / self.parent.winfo_reqwidth()
-        
+
         # maximize the window
         self.parent.state('zoomed')
 
@@ -131,12 +138,12 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                         y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i]
                         self.lines[i].set_data(x, y)
                         self.vlines[i].set_xdata(self.n_frame)
-                        
+
                         try:
                             ax = self.canvas.figure.axes[i]
                         except:
                             ax = self.canvas.figure.axes[0]
-                        
+
                         ax.set_xlim(x.min(), x.max())
                         ax.set_yscale('log')
                         ax.set_yticklabels([])
@@ -144,15 +151,15 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                             ax.set_ylim(0, 1480)
                         except:
                             ax.set_ylim(0, 50)
-                        
+
 
                     # ax.set_xlabel("frame index", fontsize='large')
                 elif len(self.lines) == 0:
-                    
+
                     for i in range(1, self.dist_df.shape[1]+1):
                         x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
                         y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
-                        
+
                         ax = self.fig.add_subplot(7, 1, i)
                         X, = ax.plot(x, y, color='#008000', label=self.dist_df.columns[i-1], lw=1.5)
                         ax.set_xlim(x.min(), x.max())
@@ -162,13 +169,13 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                             ax.set_ylim(0, 1480)
                         except Exception as e:
                             if self.dist_df.columns[i-1] == "A - x":
-                                print(e)
+                                LOGGER.exception(e)
                             ax.set_ylim(0, 0)
                         # ax.yaxis.set_major_formatter(matplotlib.ticker.ScalarFormatter())
-                        
+
                         # ax = self.fig.add_subplot(1, 1, 1)
                         # X, = ax.plot(x, y, label=self.dist_df.columns[i-1])
-                        
+
                         vX = ax.axvline(x=self.n_frame, linestyle="--", lw='2', color='r')
                         hY = ax.axhline(y=30, linestyle="--", lw='1.25', color='black')
                         # ax.legend(loc="upper center", fontsize='small')
@@ -190,7 +197,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         try:
             # if self.__drew_n_frame__ is None or self.__drew_n_frame__ != self.n_frame:
             self.draw()
-            self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))            
+            self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
             self.disply_l.configure(image=self.__image__)
                 # self.__drew_n_frame__ = self.n_frame
         except:
@@ -217,7 +224,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                 m, s = divmod(sec, 60)
                 h, m = divmod(m, 60)
                 text_time = "%d:%02d:%02d" % (h, m, s)
-                
+
                 self.label_video_name.configure(text=text_video_name)
                 self.label_time.configure(text=text_time)
             except:
@@ -252,10 +259,6 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         file.add_command(label='載入新影像', command=self.on_load)
         file.add_command(label='儲存操作', command=self.on_save)
         menu.add_cascade(label='File', menu=file)
-
-        # help = tk.Menu(menu)
-        # help.add_command(label='設定', command=lambda: print('settings'))
-        # menu.add_cascade(label='Help', menu=help)
 
     def create_op(self):
         input_frame = tk.Frame(self.op_frame)
@@ -387,7 +390,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         vsb = ttk.Scrollbar(self.info_frame, orient="vertical", command=self.pot_tv.yview)
         vsb.grid(row=1, column=1, sticky='news', pady=10)
-        
+
         self.pot_tv.configure(yscrollcommand=vsb.set)
 
     def create_res_treeview(self):
@@ -407,15 +410,15 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.tv.column('objb', anchor='center', width=80)
 
         self.tv.grid(row=1, column=0, rowspan=1, sticky='news', pady=10)
-        
+
         vsb = ttk.Scrollbar(self.info_frame, orient="vertical", command=self.tv.yview)
         vsb.grid(row=1, column=1, rowspan=1, sticky='news', pady=10)
-        
+
         self.tv.configure(yscrollcommand=vsb.set)
         self.tv.bind('<Double-Button-1>', self.tvitem_click)
 
     def create_ui(self):
-        
+
         self.create_menu()
 
         # display label
@@ -423,7 +426,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         cv2.putText(self.__frame__, 'Load Video', (300, 360), 7, 5, (255, 255, 255), 2)
         self.__orig_frame__ = self.__frame__.copy()
         self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
-        
+
 
         self.display_frame = tk.Frame(self.parent)
         self.display_frame.grid(row=0, column=0, padx=10, pady=10)
@@ -431,7 +434,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.display_frame.grid_rowconfigure(1, weight=1)
         self.display_frame.grid_columnconfigure(0, weight=1)
         self.display_frame.grid_rowconfigure(2, weight=1)
-        
+
         figsize=(1, 4)
         self.fig = Figure(figsize=figsize)
         self.fig.subplots_adjust(left=0.01,right=0.95,bottom=0,top=0.98)
@@ -485,4 +488,3 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
             self.parent.bind(k.join('<>'), self.on_key)
         for k in ['1', '2', '3']:
             self.parent.bind(k, self.on_key)
-        

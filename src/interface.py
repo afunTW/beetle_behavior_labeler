@@ -1,26 +1,31 @@
-import tkinter as tk
-from tkinter import ttk
-from tkinter.messagebox import askokcancel, showinfo, showerror, showwarning
-from tkinter.filedialog import askopenfilename
-import os
-import cv2
 import json
+import os
+import tkinter as tk
+import logging
+from tkinter import ttk
+from tkinter.filedialog import askopenfilename
+from tkinter.messagebox import askokcancel, showerror, showinfo, showwarning
+
+import cv2
 import pandas as pd
+
+
+LOGGER = logging.getLogger(__name__)
 
 class Interface(object):
 
     # show message
-    def msg(self, string, type='info'):
+    def msg(self, string, type_='info'):
         root = tk.Tk()
         root.withdraw()
-        if type == 'info':
+        if type_ == 'info':
             showinfo('Info', string)
-        elif type == 'error':
+        elif type_ == 'error':
             showerror('Error', string)
-        elif type == 'warning':
+        elif type_ == 'warning':
             showwarning('Warning', string)
         else:
-            print('Unknown type %s' % type)
+            LOGGER.info('Unknown type {}'.format(type_))
 
     # confirm quiting
     def on_close(self, event=None):
@@ -43,11 +48,11 @@ class Interface(object):
                 self.__obj_name__ = tmp['name']
             self.scale_n_frame.state(['!disabled'])
             self.scale_n_frame['to_'] = self.total_frame
-            
+
             root = '/'.join(self.video_path.split('/')[:-1])
             filename = self.video_path.split('/')[-1].split('.avi')[0] + '_behavior_record.csv'
             if os.path.isfile(os.path.join(root, filename)):
-                print('Loading previous records...')
+                LOGGER.info('Loading previous records...')
                 tmp_res = pd.read_csv(os.path.join(root, filename))
                 for i, r in tmp_res.iterrows():
                     value = (r.start_frame, r.end_frame, r.object_1, r.behav, r.object_2)
@@ -104,7 +109,7 @@ class Interface(object):
             else:
                 n_ind = name.index(self.tv.item(self.tv.selection()[0])['values'][2])
             b_ind = 0 if title == '新增' else bev.index(self.tv.item(self.tv.selection()[0])['values'][2])
-            
+
             # self.f = ttk.Combobox(top, values=list(range(1, ind[1])))
             # self.f.current(f_ind - 1)
             # e = tk.Entry(r,width=60)
@@ -142,7 +147,7 @@ class Interface(object):
             elif self.title == '更改':
                 pass
             self.top.destroy()
-        
+
     class popupEntry(object):
 
         def __init__(self, master, title, string, validnum=False):
@@ -156,7 +161,7 @@ class Interface(object):
             self.l=tk.Label(top,text=string, font=("Verdana", 12))
             self.l.pack(expand=tk.YES, fill=tk.BOTH, padx=5, pady=5)
             if validnum:
-                vcmd = (master.register(self.validate), 
+                vcmd = (master.register(self.validate),
                     '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
                 self.e =ttk.Entry(top, validate='key', validatecommand=vcmd)
             else:
@@ -182,7 +187,7 @@ class Interface(object):
         def cleanup(self):
             self.value=self.e.get()
             self.top.destroy()
-        
+
         def validate(self, action, index, value_if_allowed,
                            prior_value, text, validation_type, trigger_type, widget_name):
             if text in '0123456789':
