@@ -72,6 +72,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.parent.option_add('*tearOff', False)
         self.set_all_grid_rowconfigure(self.parent, 0, 1)
         self.set_all_grid_columnconfigure(self.parent, 0, 1)
+        LOGGER.info('Initial - window')
 
         style = ttk.Style()
         style.configure("Treeview.Heading", font=('Georgia', 14))
@@ -197,8 +198,6 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                         self.lines.append(X)
                         self.vlines.append(vX)
 
-                    # self.fig.text(0.04, 0.55, 'Distance', ha='center', fontsize='large')
-                # self.fig.tight_layout()
                 self.canvas.draw()
                 self.__drew_n_frame__ = self.n_frame
         self.parent.after(10, self.update_distance)
@@ -207,13 +206,11 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         if self.video_path is not None:
             self.update_frame()
         try:
-            # if self.__drew_n_frame__ is None or self.__drew_n_frame__ != self.n_frame:
             self.draw()
             self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
             self.disply_l.configure(image=self.__image__)
-            # self.__drew_n_frame__ = self.n_frame
-        except:
-            pass
+        except Exception as e:
+            LOGGER.exception(e)
 
         self.disply_l.after(20, self.update_display)
 
@@ -223,8 +220,6 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.__orig_frame__ = self.__frame__.copy()
 
     def update_label(self):
-        # if int(float(self.var_n_frame.get())) != self.n_frame:
-        # if str(self.label_n_frame.focus_get().__class__) != "<class 'tkinter.ttk.Entry'>":
         if self.video_path is not None:
             try:
                 self.var_n_frame.set(self.n_frame)
@@ -239,8 +234,8 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
                 self.label_video_name.configure(text=text_video_name)
                 self.label_time.configure(text=text_time)
-            except:
-                pass
+            except Exception as e:
+                LOGGER.exception(e)
 
         self.disply_l.after(10, self.update_label)
 
@@ -263,7 +258,6 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         # self.lines, self.vlines = [], []
 
     def create_menu(self):
-
         menu = tk.Menu(self.parent)
         self.parent.config(menu=menu)
 
@@ -271,12 +265,14 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         file.add_command(label='載入新影像', command=self.on_load)
         file.add_command(label='儲存操作', command=self.on_save)
         menu.add_cascade(label='File', menu=file)
+        LOGGER.info('Initial - menu')
 
     def create_op(self):
+        # display frame > operation frame > input frame
         input_frame = tk.Frame(self.op_frame)
         input_frame.grid(row=0, column=0)
-        tk.Grid.rowconfigure(input_frame, 0, weight=1)
-        tk.Grid.columnconfigure(input_frame, 0, weight=1)
+        self.set_all_grid_rowconfigure(input_frame, 0)
+        self.set_all_grid_columnconfigure(input_frame, 0)
 
         tk.Label(input_frame, text='起始幀數:', font=("Georgia", 14)).grid(row=0, column=0, padx=10, sticky='w')
         tk.Label(input_frame, text='結束幀數:', font=("Georgia", 14)).grid(row=0, column=2, padx=10, sticky='w')
@@ -286,35 +282,32 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         self.init_f = ttk.Entry(input_frame, width=8)
         self.init_f.insert(0, 0)
-        # self.init_f.configure(state='readonly')
         self.init_f.grid(row=0, column=1, padx=10, sticky='w')
 
         self.end_f = ttk.Entry(input_frame, width=8)
         self.end_f.insert(0, 0)
-        # self.end_f.configure(state='readonly')
         self.end_f.grid(row=0, column=3, padx=10, sticky='w')
 
         name = sorted(["x", "A", "o", "="])
         self.obj_a = ttk.Combobox(input_frame, values=name, width=5, state="readonly")
         self.obj_a.current(0)
-        # self.n.configure(state='readonly')
         self.obj_a.grid(row=0, column=5, padx=10, sticky='w')
 
         bev = ['Attack', 'Wrestle', 'Chase']
         self.actions = ttk.Combobox(input_frame, values=bev, width=5, state="readonly")
         self.actions.current(0)
-        # self.n.configure(state='readonly')
         self.actions.grid(row=0, column=7, padx=10, sticky='w')
 
         self.obj_b = ttk.Combobox(input_frame, values=name, width=5, state="readonly")
         self.obj_b.current(1)
-        # self.n.configure(state='readonly')
         self.obj_b.grid(row=0, column=9, padx=10, sticky='w')
 
-        # create button to click
+        # display frame > operation frame > button frame
         buttons = []
         button_frame = tk.Frame(self.op_frame)
         button_frame.grid(row=1, column=0)
+        # self.set_all_grid_rowconfigure(button_frame, 0)
+        # self.set_all_grid_columnconfigure(button_frame, 0, 1, 2, 3, 4, 5, 6)
         return_img = ImageTk.PhotoImage(file='icons/return.png')
         next_img = ImageTk.PhotoImage(file='icons/next.png')
         next2_img = ImageTk.PhotoImage(file='icons/down.png')
@@ -344,22 +337,18 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         b_delete = ttk.Button(button_frame, image=delete_img, command=self.on_delete)
         b_delete.image = delete_img
         buttons.append(b_delete)
-
         for i, b in enumerate(buttons):
             b.grid(row=0, column=i, sticky='news', padx=10, pady=10)
             b.config(cursor='hand2')
 
         vcmd = (self.parent.register(self.validate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
 
-        # scale bar for n frame
+        # display frame > operation frame > scale frame
         self.var_n_frame = tk.IntVar()
-
         scale_frame = tk.Frame(self.op_frame)
         scale_frame.grid(row=2, column=0, sticky='news')
-
-        scale_frame.grid_rowconfigure(0, weight=1)
-        for i in range(3):
-            scale_frame.grid_columnconfigure(i, weight=1)
+        self.set_all_grid_rowconfigure(scale_frame, 0)
+        self.set_all_grid_columnconfigure(scale_frame, 0, 1, 2)
 
         # self.label_n_frame = ttk.Entry(scale_frame, textvariable=self.var_n_frame, width=10, justify='right', vcmd=vcmd, validate='key')
         # self.label_n_frame.bind('<Return>', self.set_n_frame_2)
@@ -370,8 +359,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.scale_n_frame.set(self.n_frame)
         self.scale_n_frame.state(['disabled'])
         self.scale_n_frame.grid(row=1, column=0, padx=10)
-        # self.label_n_frame_right = ttk.Label(scale_frame, text=str(self.total_frame))
-        # self.label_n_frame_right.grid(row=0, column=2)
+        LOGGER.info('Initial - operation frame')
 
     def create_info(self):
         text_video_name = '-----'
@@ -435,46 +423,42 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
         # display label
         self.__frame__ = np.zeros((int(720/2), int(1280/2), 3), dtype='uint8')
-        cv2.putText(self.__frame__, 'Load Video', (300, 360), 7, 5, (255, 255, 255), 2)
         self.__orig_frame__ = self.__frame__.copy()
         self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
 
-
+        # display frame
         self.display_frame = tk.Frame(self.parent)
         self.display_frame.grid(row=0, column=0, padx=10, pady=10)
-        # self.display_frame.grid_rowconfigure(0, weight=1)
-        self.display_frame.grid_rowconfigure(1, weight=1)
-        self.display_frame.grid_columnconfigure(0, weight=1)
-        self.display_frame.grid_rowconfigure(2, weight=1)
+        self.set_all_grid_rowconfigure(self.display_frame, 1, 2)
+        self.set_all_grid_columnconfigure(self.display_frame, 0)
 
+        # display frame > canvas
         figsize=(1, 4)
         self.fig = Figure(figsize=figsize)
         self.fig.subplots_adjust(left=0.01,right=0.95,bottom=0,top=0.98)
-
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.display_frame)
         self.canvas.show()
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='news')
 
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nesw')
+        # display frame > operation frame
+        self.op_frame = tk.Frame(self.display_frame)
+        self.op_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
+        self.set_all_grid_rowconfigure(self.op_frame, 0, 1)
+        self.set_all_grid_columnconfigure(self.op_frame, 0)
+        self.create_op()
 
+        # display frame > display label
         self.disply_l = ttk.Label(self.display_frame, image=self.__image__)
         self.disply_l.grid(row=2, column=0, padx=10, pady=10)
 
-        # frame operation frame
-        self.op_frame = tk.Frame(self.display_frame)
-        self.op_frame.grid(row=1, column=0, sticky='news', padx=10, pady=10)
-        self.op_frame.grid_rowconfigure(0, weight=1)
-        self.op_frame.grid_rowconfigure(1, weight=1)
-        self.op_frame.grid_columnconfigure(0, weight=1)
-        self.create_op()
-
+        # info frame
         self.info_frame = tk.Frame(self.parent)
         self.info_frame.grid(row=0, column=1, rowspan=3, sticky='news', pady=10)
-        self.info_frame.grid_columnconfigure(0, weight=1)
-        self.info_frame.grid_rowconfigure(1, weight=1)
-        self.info_frame.grid_columnconfigure(1, weight=1)
+        self.set_all_grid_rowconfigure(self.info_frame, 1)
+        self.set_all_grid_columnconfigure(self.info_frame, 0, 1)
+        self.create_info()
 
         # display info
-        self.create_info()
         # self.create_potential_treeview()
         # record operation frame
         self.create_res_treeview()
@@ -500,3 +484,5 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
             self.parent.bind(k.join('<>'), self.on_key)
         for k in ['1', '2', '3']:
             self.parent.bind(k, self.on_key)
+
+        LOGGER.info('Initial - basic UI')
