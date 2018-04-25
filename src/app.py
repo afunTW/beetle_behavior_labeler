@@ -155,16 +155,18 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
                         try:
                             ax = self.canvas.figure.axes[i]
-                        except:
+                        except Exception as e:
                             ax = self.canvas.figure.axes[0]
+                            LOGGER.exception(e)
 
                         ax.set_xlim(x.min(), x.max())
                         ax.set_yscale('log')
                         ax.set_yticklabels([])
                         try:
                             ax.set_ylim(0, 1480)
-                        except:
+                        except Exception as e:
                             ax.set_ylim(0, 50)
+                            LOGGER.exception(e)
 
 
                     # ax.set_xlabel("frame index", fontsize='large')
@@ -191,7 +193,6 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
                         vX = ax.axvline(x=self.n_frame, linestyle="--", lw='2', color='r')
                         hY = ax.axhline(y=30, linestyle="--", lw='1.25', color='black')
-                        # ax.legend(loc="upper center", fontsize='small')
                         ax.legend(loc="upper right", bbox_to_anchor=(1.05,1), fontsize='x-small')
                         if i < self.dist_df.shape[1]:
                             plt.setp(ax.get_xticklabels(), visible=False)

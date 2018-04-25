@@ -22,8 +22,8 @@ class Utils(object):
                     ind = nframe.index(self.n_frame)
                     x_c, y_c = tuple(traj[ind])
                     all_centers.append((k, (x_c, y_c)))
-                except:
-                    pass
+                except Exception as e:
+                    LOGGER.exception(e)
 
             for i, k in enumerate(sorted(self.__trajectory__.keys())):
                 v = self.__trajectory__[k]
