@@ -35,8 +35,8 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         self.video_path = None
         self.trajectory_path = None
         self.__video__ = None
-        self.__trajectory__ = None
-        self.__obj_name__ = None
+        self.__trajectory__ = None      # 被標記過的位置結果
+        self.__obj_name__ = None        # 被標記過的狀態
         self.__results_dict__ = dict()
         self.width = 1280
         self.height = 720
@@ -108,6 +108,7 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
         for row in rows:
             widget.grid_rowconfigure(row, weight=1)
 
+    # 更新 self.dist_df: 計算兩兩 label 之間的距離
     def calc_dist(self):
         obj_name = self.__obj_name__
         traj = self.__trajectory__
@@ -168,12 +169,11 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
 
                     # ax.set_xlabel("frame index", fontsize='large')
                 elif len(self.lines) == 0:
-
                     for i in range(1, self.dist_df.shape[1]+1):
                         x = self.dist_df.index[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1)]
                         y = self.dist_df.iloc[:min(self.n_frame+N_MAX_PLOT, self.dist_df.shape[0]-1), i-1]
 
-                        ax = self.fig.add_subplot(7, 1, i)
+                        ax = self.fig.add_subplot(self.dist_df.shape[1], 1, i)
                         X, = ax.plot(x, y, color='#008000', label=self.dist_df.columns[i-1], lw=1.5)
                         ax.set_xlim(x.min(), x.max())
                         ax.set_yscale('log')
@@ -197,7 +197,8 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
                             plt.setp(ax.get_xticklabels(), visible=False)
                         self.lines.append(X)
                         self.vlines.append(vX)
-
+                self.fig.tight_layout()
+                self.fig.subplots_adjust(right=0.95)
                 self.canvas.draw()
                 self.__drew_n_frame__ = self.n_frame
         self.parent.after(10, self.update_distance)
