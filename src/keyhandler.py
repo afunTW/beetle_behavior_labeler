@@ -36,8 +36,8 @@ class KeyHandler(object):
                     if self.n_frame >= int(self.init_f.get()):
                         self.end_f.delete(0, tk.END)
                         self.end_f.insert(0, self.n_frame)
-        except:
-            pass
+        except Exception as e:
+            LOGGER.exception(e)
 
     def set_n_frame_2(self, event):
         self.n_frame = int(float(self.var_n_frame.get()))
@@ -105,13 +105,12 @@ class KeyHandler(object):
                     center_2 = v2['path'][:(ind_2)]
                     wh_1 = v1['wh'][:(ind_1)]
                     wh_2 = v2['wh'][:(ind_2)]
-            except:
+            except Exception as e:
                 ind_1, ind_2 = None, None
+                LOGGER.exception(e)
 
             brk = False
-            if ind_1 is None or ind_2 is None:
-                pass
-            else:
+            if ind_1 and ind_2:
                 while True:
                     try:
                         f_1 = v1['n_frame'][ind_1]
