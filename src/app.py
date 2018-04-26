@@ -209,7 +209,10 @@ class BehaviorLabeler(KeyHandler, Interface, Utils):
             self.update_frame()
         try:
             self.draw()
-            self.__image__ = ImageTk.PhotoImage(Image.fromarray(self.__frame__))
+            self.disply_l.update()
+            resize_w, resize_h = self.parent.winfo_width()//2, self.parent.winfo_height()//2
+            image = Image.fromarray(self.__frame__).resize((resize_w, resize_h), Image.ANTIALIAS)
+            self.__image__ = ImageTk.PhotoImage(image)
             self.disply_l.configure(image=self.__image__)
         except Exception as e:
             LOGGER.exception(e)
